@@ -1,0 +1,315 @@
+/* ============================================================
+   DEVICE INFO — Meta Display HUD
+   600 × 600, D-pad, pure black (transparent) background.
+   Stacked label/value pattern so long strings never overflow.
+   ============================================================ */
+
+:root {
+  --bg-0:        #000000;       /* transparent on additive display */
+  --bg-1:        #0a0a14;
+  --bg-2:        #14141f;
+  --bg-card:     #16162a;
+  --bg-card-hi:  #1d1d33;
+
+  --text:        #ffffff;
+  --text-2:      #b8bcc8;
+  --text-3:      #7a7e8c;
+  --text-4:      #4a4d5a;
+
+  --cyan:        #00d4ff;
+  --cyan-glow:   rgba(0, 212, 255, 0.45);
+  --green:       #00ff88;
+  --amber:       #ffb84d;
+  --red:         #ff5e7e;
+
+  --radius:      10px;
+  --radius-lg:   14px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+  background: var(--bg-0);
+  color: var(--text);
+  font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-weight: 500;
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.mono {
+  font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.hidden { display: none !important; }
+
+#app { width: 100%; height: 100%; position: relative; }
+
+/* ──────────────────────────────────────────────────────────
+   Screen layout
+   The flex children need min-height:0 so .content can scroll
+   ────────────────────────────────────────────────────────── */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Header
+   ────────────────────────────────────────────────────────── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  background: var(--bg-1);
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--bg-2);
+}
+.header h1 {
+  flex: 1;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.header-meta {
+  font-size: 14px;
+  color: var(--text-3);
+  font-weight: 500;
+}
+.back-btn {
+  font-size: 26px;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius);
+  color: var(--text);
+  flex-shrink: 0;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Scrollable content
+   min-height:0 is critical so flex:1 + overflow-y:auto actually
+   scrolls inside the 600px viewport.
+   ────────────────────────────────────────────────────────── */
+.content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-card-hi) transparent;
+}
+/* Children must NOT shrink — otherwise flex tries to fit them all into the
+   viewport, crushing each row down to its min-height and forcing the inner
+   text to overflow its card. With flex-shrink: 0, rows keep their natural
+   height and .content actually scrolls. */
+.content > * { flex-shrink: 0; }
+
+/* Async-rendered groups (battery, storage) need the same column gap so
+   their nested rows space consistently with the rest of the screen. */
+.row-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.content::-webkit-scrollbar { width: 4px; }
+.content::-webkit-scrollbar-track { background: transparent; }
+.content::-webkit-scrollbar-thumb { background: var(--bg-card-hi); border-radius: 2px; }
+
+/* ──────────────────────────────────────────────────────────
+   Focus ring — applies to ALL focusable elements uniformly
+   ────────────────────────────────────────────────────────── */
+.focusable {
+  outline: none;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+}
+.focusable:focus {
+  border-color: var(--cyan);
+  box-shadow: 0 0 22px var(--cyan-glow);
+}
+
+/* ──────────────────────────────────────────────────────────
+   Home menu — large tappable rows
+   ────────────────────────────────────────────────────────── */
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 18px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  color: var(--text);
+  text-align: left;
+  min-height: 64px;
+}
+.menu-item:focus { background: var(--bg-card-hi); }
+.menu-icon {
+  font-size: 24px;
+  width: 32px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.menu-label {
+  flex: 1;
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.menu-chevron {
+  font-size: 22px;
+  color: var(--text-3);
+  flex-shrink: 0;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Section headings inside info screens
+   ────────────────────────────────────────────────────────── */
+.section-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--cyan);
+  padding: 14px 4px 4px;
+}
+.section-title:first-child { padding-top: 2px; }
+
+/* ──────────────────────────────────────────────────────────
+   Info row — STACKED label-on-top, value-below
+   This is the key fix: long strings (UAs, paths) wrap to a
+   second line instead of overflowing the container.
+   ────────────────────────────────────────────────────────── */
+.info-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  min-height: 64px;
+}
+.info-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+}
+.info-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.3;
+}
+.info-value .good  { color: var(--green); }
+.info-value .warn  { color: var(--amber); }
+.info-value .bad   { color: var(--red); }
+.info-value .muted { color: var(--text-3); }
+
+/* mono variant for IDs, codes, raw strings */
+.info-value.mono {
+  font-family: "JetBrains Mono", "SF Mono", Menlo, monospace;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  letter-spacing: -0.01em;
+  line-height: 1.45;
+}
+
+/* ──────────────────────────────────────────────────────────
+   Nav bar (bottom action row)
+   ────────────────────────────────────────────────────────── */
+.nav-bar {
+  display: flex;
+  gap: 10px;
+  padding: 12px 16px;
+  background: var(--bg-1);
+  border-top: 1px solid var(--bg-2);
+  flex-shrink: 0;
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+  min-height: 52px;
+}
+.nav-item:focus { background: var(--bg-card-hi); }
+.nav-item.primary {
+  background: var(--cyan);
+  color: var(--bg-0);
+}
+.nav-item.primary:focus { background: #33ddff; }
+
+/* ──────────────────────────────────────────────────────────
+   Feature grid — APIs & Features screen
+   2-column compact grid of supported/unsupported badges
+   ────────────────────────────────────────────────────────── */
+.feature-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.feature-badge {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  min-height: 48px;
+}
+.feature-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.feature-dot.yes { background: var(--green); box-shadow: 0 0 8px rgba(0, 255, 136, 0.5); }
+.feature-dot.no  { background: var(--red); }
+.feature-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.feature-badge.disabled .feature-name { color: var(--text-3); }

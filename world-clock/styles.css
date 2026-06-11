@@ -1,0 +1,175 @@
+:root {
+  --accent: #38e0c8;
+  --dim: #6f7d7a;
+  --fg: #eafffb;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body {
+  width: 600px;
+  height: 600px;
+  background: #000;
+  overflow: hidden;
+}
+
+#app {
+  width: 600px;
+  height: 600px;
+  background: #000;
+  color: var(--fg);
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  position: relative;
+}
+
+.mono { font-family: "JetBrains Mono", monospace; }
+.hidden { display: none !important; }
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 34px 40px 28px;
+}
+
+/* ---------------- HOME ---------------- */
+.topbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.brand-mark { font-size: 26px; }
+.brand-text {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: 4px;
+  color: var(--accent);
+}
+
+.fav-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+}
+
+.fav {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 14px 20px;
+  border: 2px solid #1a2a28;
+  border-radius: 16px;
+  background: #060b0a;
+}
+.fav.sel {
+  border-color: var(--accent);
+  background: #07201c;
+}
+.fav-left { display: flex; flex-direction: column; gap: 2px; }
+.fav-city {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.fav-meta {
+  font-size: 14px;
+  color: var(--dim);
+  letter-spacing: 1px;
+}
+.fav-time {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--accent);
+  line-height: 1;
+}
+.fav-time .sec { font-size: 20px; color: var(--dim); }
+.fav-ampm { font-size: 15px; color: var(--dim); margin-left: 6px; }
+
+/* "Add city" action row */
+.fav.add {
+  justify-content: center;
+  gap: 12px;
+  border-style: dashed;
+  border-color: #244540;
+  background: transparent;
+  color: var(--dim);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+.fav.add.sel { color: var(--accent); border-color: var(--accent); }
+
+.empty-note {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: var(--dim);
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.home-hint {
+  text-align: center;
+  margin-top: 18px;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--dim);
+}
+
+/* ---------------- PICKER ---------------- */
+.step-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+.step-title {
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 3px;
+  color: var(--accent);
+}
+.step-hint { font-size: 12px; letter-spacing: 1px; color: var(--dim); }
+
+.city-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.city {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+}
+.city.sel {
+  border-color: var(--accent);
+  background: #07201c;
+}
+.city-name { font-size: 21px; font-weight: 600; }
+.city-right { display: flex; align-items: center; gap: 14px; }
+.city-clock {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 17px;
+  color: var(--dim);
+}
+.city.sel .city-clock { color: var(--fg); }
+.star {
+  font-size: 20px;
+  width: 24px;
+  text-align: center;
+  color: #2a3a38;
+}
+.city.fav .star { color: var(--accent); }

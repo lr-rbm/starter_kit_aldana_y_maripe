@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no" />
+  <title>Flight Status</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+<script defer src="https://cloud.umami.is/script.js" data-website-id="be32beae-a2a9-423f-b55d-e646ec260f93"></script>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===========================================================
+       HOME
+       =========================================================== -->
+  <section id="home" class="screen">
+    <header class="topbar">
+      <span class="brand-mark">✈</span>
+      <span class="brand-text">FLIGHT&nbsp;STATUS</span>
+      <span class="topbar-clock mono" id="clock-home">—:—</span>
+    </header>
+
+    <div class="hero">
+      <div class="hero-title">CHECK<br>YOUR&nbsp;FLIGHT</div>
+      <div class="hero-sub">TERMINAL · GATE · SEAT · CAROUSEL</div>
+    </div>
+
+    <button class="last-card focusable hidden" data-action="restore" id="last-card">
+      <div class="last-label">LAST&nbsp;FLIGHT</div>
+      <div class="last-line">
+        <span class="last-code mono" id="last-code">AA·1234</span>
+        <span class="last-route mono" id="last-route">JFK → LAX</span>
+      </div>
+      <div class="last-go">OPEN&nbsp;›</div>
+    </button>
+
+    <button class="cta focusable" data-action="start" id="cta-start">
+      <span class="cta-icon">▶</span>
+      <span class="cta-label">FIND&nbsp;FLIGHT</span>
+    </button>
+  </section>
+
+  <!-- ===========================================================
+       STEP 1 — AIRLINE
+       =========================================================== -->
+  <section id="step-airline" class="screen hidden">
+    <header class="step-head">
+      <span class="step-title">AIRLINE</span>
+      <span class="step-pips"><i class="pip on"></i><i class="pip"></i><i class="pip"></i></span>
+    </header>
+
+    <div class="carousel" id="airline-carousel">
+      <div class="carousel-side mono" id="airline-prev">—</div>
+      <div class="carousel-card">
+        <div class="airline-code mono" id="airline-code">AA</div>
+        <div class="airline-name" id="airline-name">American Airlines</div>
+        <div class="airline-count" id="airline-count">1 / 12</div>
+      </div>
+      <div class="carousel-side mono" id="airline-next">—</div>
+    </div>
+  </section>
+
+  <!-- ===========================================================
+       STEP 2 — FLIGHT NUMBER
+       =========================================================== -->
+  <section id="step-number" class="screen hidden">
+    <header class="step-head">
+      <span class="step-title">FLIGHT&nbsp;NUMBER</span>
+      <span class="step-pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span>
+    </header>
+
+    <div class="number-stage">
+      <div class="number-prefix mono" id="number-prefix">AA</div>
+      <div class="digits" id="digits">
+        <div class="digit" data-idx="0">
+          <span class="digit-arrow up">▲</span>
+          <span class="digit-val mono">0</span>
+          <span class="digit-arrow down">▼</span>
+        </div>
+        <div class="digit" data-idx="1">
+          <span class="digit-arrow up">▲</span>
+          <span class="digit-val mono">0</span>
+          <span class="digit-arrow down">▼</span>
+        </div>
+        <div class="digit" data-idx="2">
+          <span class="digit-arrow up">▲</span>
+          <span class="digit-val mono">0</span>
+          <span class="digit-arrow down">▼</span>
+        </div>
+        <div class="digit" data-idx="3">
+          <span class="digit-arrow up">▲</span>
+          <span class="digit-val mono">0</span>
+          <span class="digit-arrow down">▼</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===========================================================
+       STEP 3 — DATE
+       =========================================================== -->
+  <section id="step-date" class="screen hidden">
+    <header class="step-head">
+      <span class="step-title">DATE</span>
+      <span class="step-pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></span>
+    </header>
+
+    <div class="date-grid" id="date-grid">
+      <div class="date-tile active" data-value="0">
+        <div class="date-day">TODAY</div>
+        <div class="date-sub mono" id="date-today">MON · MAY 11</div>
+      </div>
+      <div class="date-tile" data-value="1">
+        <div class="date-day">TOMORROW</div>
+        <div class="date-sub mono" id="date-tomorrow">TUE · MAY 12</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===========================================================
+       STATUS
+       =========================================================== -->
+  <section id="status" class="screen hidden">
+    <!-- Compact strip: shown when status is collapsed via swipe-up.
+         Has two sub-views (main / seat) that mirror the full screen. -->
+    <div class="status-compact hidden" id="status-compact">
+      <div class="cs-top">
+        <span class="cs-flight mono" id="cs-flight">AA·0007</span>
+      </div>
+
+      <!-- Compact MAIN: TERM · GATE · BOARDS -->
+      <div class="cs-view cs-view-main" id="cs-view-main">
+        <div class="cs-row">
+          <div class="cs-col">
+            <span class="cs-val mono" id="cs-terminal">6</span>
+            <span class="cs-label">TERM</span>
+          </div>
+          <div class="cs-col">
+            <span class="cs-val mono cs-amber" id="cs-gate">B49</span>
+            <span class="cs-label">GATE</span>
+          </div>
+          <div class="cs-col">
+            <span class="cs-val mono cs-amber" id="cs-board">20:37</span>
+            <span class="cs-label">BOARDS</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compact SEAT: seat code + class/role -->
+      <div class="cs-view cs-view-seat hidden" id="cs-view-seat">
+        <div class="cs-seat">
+          <span class="cs-val cs-cyan mono" id="cs-seat">15F</span>
+          <div class="cs-seat-meta">
+            <span class="cs-label">SEAT</span>
+            <span class="cs-seat-sub" id="cs-seat-sub">ECONOMY · AISLE</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Compact CAROUSEL: big carousel # -->
+      <div class="cs-view cs-view-carousel hidden" id="cs-view-carousel">
+        <div class="cs-seat">
+          <span class="cs-val cs-amber mono" id="cs-carousel">12</span>
+          <div class="cs-seat-meta">
+            <span class="cs-label cs-label-amber">CAROUSEL</span>
+            <span class="cs-seat-sub">BAGGAGE&nbsp;CLAIM</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- mini page dots so you know swipes change which compact view -->
+      <div class="cs-dots">
+        <i class="cs-dot on" id="cs-dot-main"></i>
+        <i class="cs-dot" id="cs-dot-seat"></i>
+        <i class="cs-dot" id="cs-dot-carousel"></i>
+      </div>
+    </div>
+
+    <header class="status-head">
+      <div class="status-flight mono" id="s-flight">AA · 1234</div>
+      <div class="status-route mono" id="s-route">JFK → LAX</div>
+      <div class="status-clock mono" id="clock-status">—:—</div>
+    </header>
+
+    <div class="status-badge" id="s-badge">ON TIME</div>
+
+    <div class="status-views" id="status-views">
+      <div class="status-view view-main" id="view-main">
+        <div class="info-grid">
+          <div class="info-tile">
+            <div class="info-label">TERMINAL</div>
+            <div class="info-value mono" id="s-terminal">8</div>
+          </div>
+          <div class="info-tile info-accent">
+            <div class="info-label">GATE</div>
+            <div class="info-value mono" id="s-gate">B42</div>
+          </div>
+          <div class="info-tile info-accent info-tile-wide">
+            <div class="info-label">BOARD</div>
+            <div class="info-value mono" id="s-board">14:25</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-view view-seat hidden" id="view-seat">
+        <div class="seat-card">
+          <div class="seat-label">SEAT</div>
+          <div class="seat-value mono" id="s-seat">14C</div>
+          <div class="seat-sub" id="s-seat-sub">ECONOMY · WINDOW</div>
+        </div>
+      </div>
+
+      <div class="status-view view-carousel hidden" id="view-carousel">
+        <div class="carousel-card-status">
+          <div class="carousel-label">CAROUSEL</div>
+          <div class="carousel-value mono" id="s-carousel">6</div>
+          <div class="carousel-sub">BAGGAGE&nbsp;CLAIM</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="status-dots">
+      <i class="dot on" id="dot-main"></i>
+      <i class="dot" id="dot-seat"></i>
+      <i class="dot" id="dot-carousel"></i>
+    </div>
+
+    <div class="status-foot">
+      <div class="time-row mono">
+        <span class="time-label">DEP</span><span class="time-val" id="s-dep">14:55</span>
+        <span class="time-sep">—</span>
+        <span class="time-label">ARR</span><span class="time-val" id="s-arr">18:32</span>
+      </div>
+    </div>
+  </section>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,530 @@
+:root {
+  /* pure black = transparent on glasses */
+  --bg:           #000;
+  --bg-2:         #000;
+  --bg-3:         #000;
+
+  --paper:        #f7eed8;
+  --paper-2:      #e8d8a8;
+  --paper-back:   #fff8e8;
+  --paper-shade:  #c2a866;
+  --paper-edge:   #8b7449;
+
+  --ink:          #f5ecd2;
+  --ink-soft:     #d9c89c;
+  --ink-dim:      #b09870;
+  --ink-faint:    #6a5838;
+
+  --sumi:         #2a2218;     /* deep ink */
+  --crease:       #c9b070;     /* existing creases */
+
+  --vermilion:    #ff5a48;     /* hanko red, brightened for AR contrast */
+  --vermilion-hi: #ff8a78;
+  --vermilion-glow: rgba(255,90,72,0.55);
+  --vermilion-faint: rgba(255,90,72,0.16);
+
+  --pad-l:        96px;
+  --pad-r:        22px;
+  --pad-t:        14px;
+  --pad-b:        12px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+  background: #000;
+  color: var(--ink);
+  font-family: "Shippori Mincho", "Cormorant Garamond", "Times New Roman", serif;
+  -webkit-font-smoothing: antialiased;
+  font-weight: 500;
+  font-size: 22px;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  letter-spacing: inherit;
+  padding: 0;
+}
+
+#app {
+  position: relative;
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+  background: #000;
+}
+
+/* ────────── Screen base ────────── */
+.screen {
+  position: absolute;
+  inset: 0;
+  width: 600px;
+  height: 600px;
+  padding: var(--pad-t) var(--pad-r) var(--pad-b) var(--pad-l);
+  display: flex;
+  flex-direction: column;
+  text-align: right;
+  align-items: stretch;
+}
+.hidden { display: none !important; }
+
+/* ────────── Header ────────── */
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  font-size: 22px;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.brand-mark {
+  font-family: "Shippori Mincho", serif;
+  font-weight: 700;
+  font-size: 26px;
+  color: #000;
+  background: var(--vermilion);
+  width: 38px;
+  height: 38px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  letter-spacing: 0;
+  box-shadow: 0 0 18px var(--vermilion-glow);
+  transform: rotate(-3deg);
+  flex-shrink: 0;
+}
+.brand {
+  color: var(--ink);
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  font-size: 22px;
+  white-space: nowrap;
+}
+.serial {
+  font-family: "Share Tech Mono", monospace;
+  color: var(--ink-dim);
+  letter-spacing: 0.10em;
+  font-weight: 400;
+  font-size: 18px;
+  margin-left: 2px;
+  white-space: nowrap;
+}
+
+/* ────────── Menu eyebrow + list ────────── */
+.menu-eyebrow {
+  margin-top: 14px;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 16px;
+  letter-spacing: 0.30em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+}
+
+.menu-list {
+  margin-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-height: 0;
+  justify-content: center;
+}
+
+.menu-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 6px 10px 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  transition: border-color 120ms, background 120ms, color 120ms;
+  white-space: nowrap;
+}
+.menu-row .row-name {
+  color: var(--ink);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  font-family: "Cormorant Garamond", "Shippori Mincho", serif;
+  white-space: nowrap;
+}
+.menu-row .row-meta {
+  color: var(--ink-dim);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  min-width: 68px;
+  text-align: left;
+  white-space: nowrap;
+}
+.menu-row .row-stars {
+  color: var(--vermilion);
+  font-size: 16px;
+  letter-spacing: 0.10em;
+  min-width: 46px;
+  text-align: left;
+  white-space: nowrap;
+}
+.menu-row .row-kanji {
+  font-family: "Shippori Mincho", serif;
+  font-size: 28px;
+  color: var(--vermilion);
+  letter-spacing: 0;
+  width: 32px;
+  text-align: center;
+  opacity: 0.85;
+  flex-shrink: 0;
+}
+.menu-row.focused {
+  border-color: var(--vermilion);
+  background:
+    linear-gradient(90deg, transparent 0%, rgba(255,90,72,0.14) 100%);
+  box-shadow: 0 0 14px var(--vermilion-faint);
+}
+.menu-row.focused .row-name { color: var(--paper-back); }
+.menu-row.focused .row-kanji { opacity: 1; text-shadow: 0 0 10px var(--vermilion-glow); }
+
+/* ────────── Fold screen ────────── */
+.fold-chip-row {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+}
+.fold-chip {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 16px;
+  letter-spacing: 0.22em;
+  color: var(--vermilion-hi);
+  border: 1.5px solid var(--vermilion);
+  padding: 4px 12px;
+  border-radius: 4px;
+  background: rgba(255,90,72,0.10);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+.fold-chip.mountain { color: #ffd4a0; border-color: #ffae5e; background: rgba(255,174,94,0.10); }
+.fold-chip.squash   { color: #b8e6ff; border-color: #6cb5f0; background: rgba(108,181,240,0.10); }
+.fold-chip.petal    { color: #ffb3d8; border-color: #ff6ea8; background: rgba(255,110,168,0.10); }
+.fold-chip.reverse  { color: #b8ffc7; border-color: #66e688; background: rgba(102,230,136,0.10); }
+.fold-chip.unfold   { color: var(--ink-soft); border-color: var(--ink-dim); background: rgba(176,152,112,0.10); }
+.fold-chip.start    { color: var(--ink); border-color: var(--ink-soft); background: rgba(243,231,200,0.08); }
+.fold-chip.shape    { color: #ffe2a8; border-color: #f0c662; background: rgba(240,198,98,0.10); }
+
+.fold-difficulty {
+  font-size: 18px;
+  letter-spacing: 0.14em;
+  color: var(--vermilion);
+  font-family: "Share Tech Mono", monospace;
+}
+
+/* ────────── Diagram ────────── */
+.diagram-wrap {
+  margin-top: 8px;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+}
+.diagram {
+  flex: 1 1 auto;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+}
+.diagram svg {
+  width: 100%;
+  height: 100%;
+  max-height: 340px;
+  display: block;
+}
+.diagram svg .paper {
+  fill: var(--paper);
+  stroke: var(--sumi);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+}
+.diagram svg .paper.back  { fill: var(--paper-back); }
+.diagram svg .paper.shade { fill: var(--paper-shade); }
+.diagram svg .paper.shade2 { fill: var(--paper-2); }
+.diagram svg .crease {
+  stroke: var(--crease);
+  stroke-width: 1.6;
+  stroke-dasharray: 2 3;
+  fill: none;
+}
+.diagram svg .valley {
+  stroke: var(--vermilion);
+  stroke-width: 2.6;
+  stroke-dasharray: 6 4;
+  fill: none;
+}
+.diagram svg .mountain {
+  stroke: var(--vermilion);
+  stroke-width: 2.6;
+  stroke-dasharray: 9 3 2 3;
+  fill: none;
+}
+.diagram svg .arrow {
+  fill: none;
+  stroke: var(--vermilion);
+  stroke-width: 2.6;
+  stroke-linecap: round;
+}
+.diagram svg .arrow-head {
+  fill: var(--vermilion);
+  stroke: none;
+}
+.diagram svg .label {
+  font-family: "Share Tech Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  fill: var(--ink-soft);
+  text-anchor: middle;
+}
+
+.diagram.tick svg {
+  animation: diagramPop 380ms cubic-bezier(0.2, 0.9, 0.3, 1.4);
+}
+@keyframes diagramPop {
+  0%   { transform: translateY(-3px) scale(0.97); opacity: 0; }
+  60%  { transform: translateY(0)    scale(1.02); opacity: 1; }
+  100% { transform: translateY(0)    scale(1);    opacity: 1; }
+}
+
+/* ────────── Instruction ────────── */
+.instruction {
+  margin-top: 6px;
+  font-family: "Cormorant Garamond", "Shippori Mincho", serif;
+  font-size: 30px;
+  line-height: 1.16;
+  color: var(--paper);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-align: right;
+  min-height: 64px;
+}
+.instruction strong {
+  color: var(--vermilion-hi);
+  font-weight: 700;
+}
+
+/* ────────── Progress dots ────────── */
+.progress-row {
+  margin-top: 6px;
+  display: flex;
+  justify-content: flex-end;
+}
+.progress-dots {
+  display: inline-flex;
+  gap: 5px;
+  align-items: center;
+}
+.progress-dots .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid var(--ink-dim);
+  transition: background 120ms, transform 120ms;
+}
+.progress-dots .dot.done {
+  background: var(--vermilion);
+  border-color: var(--vermilion);
+  box-shadow: 0 0 6px var(--vermilion-glow);
+}
+.progress-dots .dot.current {
+  background: var(--paper);
+  border-color: var(--paper);
+  transform: scale(1.25);
+  box-shadow: 0 0 8px rgba(243,231,200,0.5);
+}
+
+/* ────────── Hints footer ────────── */
+.hints {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  font-size: 17px;
+  letter-spacing: 0.18em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  font-family: "Share Tech Mono", monospace;
+}
+.hints .key {
+  color: var(--vermilion);
+  font-family: "Share Tech Mono", monospace;
+  letter-spacing: 0;
+  margin-right: 4px;
+  font-size: 19px;
+  font-weight: 700;
+}
+
+/* ────────── Done screen ────────── */
+.done-stamp {
+  margin: 14px 0 0 auto;
+  width: 140px;
+  height: 140px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.done-stamp-inner {
+  width: 100%;
+  height: 100%;
+  border: 4px solid var(--vermilion);
+  border-radius: 10px;
+  background: rgba(255,90,72,0.10);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: rotate(-7deg);
+  box-shadow: 0 0 0 1px rgba(255,90,72,0.4), 0 0 26px var(--vermilion-glow);
+  position: relative;
+}
+.done-stamp-inner::after {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  border: 1.5px dashed var(--vermilion);
+  border-radius: 7px;
+  opacity: 0.55;
+}
+.done-kanji {
+  font-family: "Shippori Mincho", serif;
+  font-size: 60px;
+  font-weight: 700;
+  color: var(--vermilion-hi);
+  line-height: 1;
+}
+.done-label {
+  font-family: "Shippori Mincho", serif;
+  font-size: 18px;
+  color: var(--vermilion);
+  letter-spacing: 0.2em;
+  margin-top: 4px;
+}
+
+.done-name {
+  margin-top: 16px;
+  font-family: "Cormorant Garamond", serif;
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--paper);
+  letter-spacing: 0.04em;
+  line-height: 1;
+}
+.done-sub {
+  margin-top: 4px;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 16px;
+  letter-spacing: 0.22em;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+}
+
+.done-actions {
+  margin-top: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+/* ────────── Buttons ────────── */
+.btn {
+  flex: 1 1 0;
+  min-height: 62px;
+  border-radius: 6px;
+  border: 1.5px solid var(--ink-faint);
+  background: transparent;
+  color: var(--paper);
+  font-family: "Share Tech Mono", monospace;
+  font-size: 18px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 80ms ease-out, border-color 120ms, color 120ms, box-shadow 120ms;
+}
+.btn:focus { outline: none; }
+.btn.focused,
+.btn:focus-visible {
+  border-color: var(--vermilion);
+  color: var(--vermilion-hi);
+  box-shadow:
+    0 0 0 1px var(--vermilion),
+    0 0 22px var(--vermilion-faint);
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary {
+  border-color: var(--vermilion);
+  background: rgba(255,90,72,0.12);
+}
+.btn-primary.focused {
+  border-color: var(--vermilion-hi);
+  color: #ffe7e0;
+  box-shadow:
+    0 0 0 1.5px var(--vermilion-hi),
+    0 0 24px var(--vermilion-glow);
+}
+.btn-glyph {
+  font-family: "Shippori Mincho", serif;
+  font-size: 22px;
+  letter-spacing: 0;
+}
+
+/* ────────── Status ────────── */
+.status {
+  position: absolute;
+  right: var(--pad-r);
+  bottom: 4px;
+  font-family: "Share Tech Mono", monospace;
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 220ms ease-out;
+  z-index: 20;
+}
+.status.show { opacity: 1; }
+
+/* ────────── Animations ────────── */
+.screen.shake {
+  animation: paperShake 320ms ease-out;
+}
+@keyframes paperShake {
+  0%   { transform: translateX(0); }
+  25%  { transform: translateX(-2px); }
+  50%  { transform: translateX(2px); }
+  75%  { transform: translateX(-1px); }
+  100% { transform: translateX(0); }
+}

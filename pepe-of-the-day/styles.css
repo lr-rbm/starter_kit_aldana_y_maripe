@@ -1,0 +1,160 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --accent: #4caf50;
+  --dim: #6b6b6b;
+}
+
+html,
+body {
+  width: 600px;
+  height: 600px;
+  background: #000;
+  overflow: hidden;
+}
+
+body {
+  color: #fff;
+  font-family: "Space Grotesk", sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.screen {
+  width: 600px;
+  height: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 48px 0 56px;
+}
+
+.screen[hidden] {
+  display: none;
+}
+
+/* --- Cover screen --- */
+.cover {
+  justify-content: center;
+  position: relative;
+}
+
+.arc {
+  width: 600px;
+  height: 600px;
+}
+
+.arc-text {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 38px;
+  letter-spacing: 1px;
+  fill: #fff;
+}
+
+.hint {
+  position: absolute;
+  bottom: 120px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 18px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  animation: blink 1.4s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.title {
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-align: center;
+  line-height: 1.15;
+  color: #fff;
+}
+
+.stage {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.reel {
+  width: 300px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pepe {
+  max-width: 300px;
+  max-height: 300px;
+  object-fit: contain;
+  image-rendering: auto;
+}
+
+/* subtle pulse while flashing through pepes */
+.reel.spinning .pepe {
+  animation: pulse 0.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(0.96);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* pop when the chosen pepe lands */
+.reel.landed .pepe {
+  animation: pop 0.45s cubic-bezier(0.18, 1.4, 0.4, 1) both;
+}
+
+@keyframes pop {
+  0% {
+    transform: scale(0.6);
+    opacity: 0.4;
+  }
+  60% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.footer {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 18px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+
+.footer.show {
+  opacity: 1;
+}

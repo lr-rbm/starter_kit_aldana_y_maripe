@@ -125,6 +125,19 @@ Claude will update the code and redeploy. You'll get a new URL (or the same one 
 
 ---
 
+## By MP and Aldana
+
+Apps we built in this kit:
+
+| App | What it does | Live |
+|---|---|---|
+| [Raincheck](raincheck/) | Will it rain today? Day verdict plus morning/afternoon/evening bands for any city | [raincheck-nine.vercel.app](https://raincheck-nine.vercel.app) |
+| [Pepe of the Day](pepe-of-the-day/) | A fresh Pepe served once a day | [pepe-of-the-day.vercel.app](https://pepe-of-the-day.vercel.app) |
+| [Rolunchete](rolunchete/) | Spin-the-wheel decider for picking from your own options | [rolunchete.vercel.app](https://rolunchete.vercel.app) |
+| [Ballsy 8](ballsy-8/) | Magic 8-ball — ask a question, get an answer | [ballsy-8.vercel.app](https://ballsy-8.vercel.app) |
+
+---
+
 ## Examples to spark ideas
 
 These are demos already built in this repo. Each one shows a different pattern (timers, lists, pickers, games, etc.) — feel free to ask Claude to build something similar.

@@ -1,0 +1,183 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --accent: #1a6dff;
+  --ink: #f4f6ff;
+}
+
+html, body {
+  width: 600px;
+  height: 600px;
+  background: #000;
+  overflow: hidden;
+}
+
+.stage {
+  width: 600px;
+  height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* the backing plate hugs the ball + text instead of filling the screen.
+   Semi-transparent white: opaque enough to make the ball read as solid on the
+   additive lens, but lets some of the world show through so it's not blinding. */
+.plate {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  /* fixed size so the plate never reflows as the caption text changes */
+  width: 500px;
+  padding: 36px 0 30px;
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: 48px;
+}
+
+/* keep text dark on the plate */
+.hint { color: rgba(20, 24, 32, 0.55) !important; }
+
+.ball {
+  position: relative;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease;
+}
+
+/* the dark sphere. It sits on the opaque white plate, so it can be a real
+   black 8-ball now — contrast against the plate makes it read as solid. */
+.ball-fill { display: none; }
+
+.ball::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 30%, #3a3f48 0%, #14171c 45%, #050608 100%);
+  box-shadow:
+    inset 0 0 60px rgba(0, 0, 0, 0.9),
+    inset 22px 26px 48px rgba(255, 255, 255, 0.08);
+  z-index: 1;
+}
+
+/* glossy highlight */
+.ball::before {
+  content: "";
+  position: absolute;
+  top: 38px;
+  left: 70px;
+  width: 120px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.4), transparent 70%);
+  filter: blur(2px);
+  z-index: 3;
+}
+
+.window {
+  position: relative;
+  z-index: 2;
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 40%, #15356b 0%, #0d2350 60%, #0a1b3f 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 26px rgba(0, 0, 0, 0.45);
+}
+
+/* the classic blue triangle, inscribed in the round window. Its centroid is
+   1/3 up from the base, so the bounding box must be nudged down to put that
+   centroid at the window center — otherwise the base corners hit the rim
+   while the apex floats short. */
+.triangle {
+  position: relative;
+  width: 156px;
+  height: 135px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+  background: linear-gradient(180deg, #2f8bff 0%, var(--accent) 55%, #0c4bd6 100%);
+  /* box center is below the centroid by H/6, so lift the box to put the
+     centroid at the window center → all three vertices equidistant from rim */
+  transform: translateY(-22.5px);
+}
+
+.answer {
+  position: absolute;
+  /* sit in the lower portion of the triangle where it's wide enough */
+  top: 64%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+  line-height: 1.12;
+  font-size: 14px;
+  white-space: pre-line;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  transition: opacity 0.18s ease;
+}
+
+/* the resting "8" state */
+.answer.eight {
+  font-size: 64px;
+}
+
+.answer.fade { opacity: 0; }
+
+/* readable replica of the response under the ball */
+.caption {
+  font-family: "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 30px;
+  line-height: 1.15;
+  color: #11151c;
+  text-align: center;
+  width: 420px;
+  max-width: 420px;
+  /* reserve room for two lines so the ball never shifts when the caption
+     wraps. 30px font * 1.15 line-height * 2 lines ≈ 69px */
+  height: 70px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.18s ease;
+}
+
+.caption.show { opacity: 1; }
+
+.hint {
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 500;
+  font-size: 16px;
+  letter-spacing: 0.08em;
+  color: rgba(244, 246, 255, 0.55);
+  text-transform: uppercase;
+  transition: opacity 0.3s ease;
+}
+
+.hint.hidden { opacity: 0; }
+
+/* shake animation */
+@keyframes shake {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  15%  { transform: translate(-14px, 6px) rotate(-5deg); }
+  30%  { transform: translate(12px, -8px) rotate(4deg); }
+  45%  { transform: translate(-10px, 8px) rotate(-3deg); }
+  60%  { transform: translate(10px, -6px) rotate(3deg); }
+  75%  { transform: translate(-6px, 4px) rotate(-2deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+.ball.shaking { animation: shake 0.6s ease; }

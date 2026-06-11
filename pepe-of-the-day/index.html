@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pepe of the Day</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Cover screen -->
+  <main class="screen cover" id="cover">
+    <svg class="arc" viewBox="0 0 600 600" aria-label="What Pepe rules your day?">
+      <defs>
+        <path id="arcTop" d="M 70 380 A 250 250 0 0 1 530 380" fill="none" />
+      </defs>
+      <text class="arc-text">
+        <textPath href="#arcTop" startOffset="50%" text-anchor="middle">
+          WHAT PEPE RULES YOUR DAY?
+        </textPath>
+      </text>
+    </svg>
+    <p class="hint" id="hint">press enter</p>
+  </main>
+
+  <!-- Roulette screen -->
+  <main class="screen" id="game" hidden>
+    <h1 class="title">YOUR PEPE<br />OF THE DAY</h1>
+
+    <div class="stage">
+      <div class="reel" id="reel">
+        <canvas class="pepe-canvas" id="canvas" width="300" height="300"></canvas>
+        <img class="pepe" id="pepe" alt="Pepe" hidden />
+      </div>
+    </div>
+
+    <p class="footer" id="footer">come back tomorrow</p>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

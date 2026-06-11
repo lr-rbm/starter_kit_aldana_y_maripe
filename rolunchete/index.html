@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no" />
+  <title>Rolunchete</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080808;
+      --hub: #080808;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 600px;
+      height: 600px;
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #fff;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    #app {
+      width: 600px;
+      height: 600px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* ---------- MAIN VIEW ---------- */
+
+    #mainView {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 14px 16px 16px;
+      gap: 8px;
+    }
+
+    #appName {
+      font-family: 'Anton', system-ui, sans-serif;
+      font-size: clamp(1.5rem, 5vw, 2.2rem);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      line-height: 1;
+      text-align: center;
+    }
+
+    .wheel-stage {
+      position: relative;
+      width: min(340px, calc(100vw - 32px));
+      height: min(340px, calc(100vw - 32px));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* White downward-pointing triangle pointer fixed at top center */
+    .pointer {
+      position: absolute;
+      top: -2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 15px solid transparent;
+      border-right: 15px solid transparent;
+      border-top: 24px solid #fff;
+      z-index: 5;
+    }
+
+    #wheel {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .wheel-rotor {
+      transform-origin: 50% 50%;
+      transition: transform 4.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+
+    .seg-label {
+      font-family: 'Anton', system-ui, sans-serif;
+      letter-spacing: 0.02em;
+      dominant-baseline: middle;
+    }
+
+    /* ---------- WINNER ---------- */
+
+    .winner-area {
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .winner-chip {
+      font-family: 'Anton', system-ui, sans-serif;
+      font-size: 1.85rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      line-height: 1;
+      border-radius: 8px;
+      padding: 8px 26px;
+      animation: winnerPop 420ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .winner-sub {
+      font-size: 0.72rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.55);
+      animation: subFade 300ms ease both;
+      animation-delay: 150ms;
+    }
+
+    @keyframes winnerPop {
+      from { transform: scale(0.5); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    @keyframes subFade {
+      from { transform: translateY(4px); opacity: 0; }
+      to   { transform: translateY(0);   opacity: 1; }
+    }
+
+    /* ---------- BUTTONS ---------- */
+
+    .actions {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      max-width: 340px;
+    }
+
+    .btn-primary {
+      font-family: system-ui, sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      background: #fff;
+      color: #080808;
+      border: none;
+      border-radius: 6px;
+      padding: 12px 0;
+      width: 100%;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .btn-primary:disabled {
+      cursor: default;
+      color: #555;
+    }
+
+    .btn-secondary {
+      font-family: system-ui, sans-serif;
+      font-size: 0.76rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      background: transparent;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      border-radius: 6px;
+      padding: 9px 0;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .focusable:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.7);
+      outline-offset: 2px;
+    }
+
+    /* ---------- EDIT VIEW (full replacement, no overlay) ---------- */
+
+    #editView {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 18px 16px;
+      gap: 12px;
+    }
+
+    .edit-title {
+      font-family: 'Anton', system-ui, sans-serif;
+      font-size: 1.4rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-align: center;
+    }
+
+    .field-label {
+      font-size: 0.66rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.4);
+      text-align: center;
+    }
+
+    .edit-count {
+      color: rgba(255, 255, 255, 0.55);
+    }
+
+    .edit-count.warn {
+      color: #FFB020;
+    }
+
+    .options-list {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding-right: 2px;
+    }
+
+    .opt-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px 12px;
+      cursor: pointer;
+    }
+
+    .opt-row.on {
+      border-color: rgba(255, 255, 255, 0.45);
+    }
+
+    .opt-row.disabled-toggle {
+      opacity: 0.5;
+    }
+
+    .swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 5px;
+      flex: 0 0 auto;
+    }
+
+    .opt-name {
+      flex: 1;
+      min-width: 0;
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .opt-row.on .opt-name {
+      color: #fff;
+    }
+
+    .opt-check {
+      flex: 0 0 auto;
+      width: 22px;
+      height: 22px;
+      border-radius: 5px;
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      line-height: 1;
+      color: #080808;
+    }
+
+    .opt-row.on .opt-check {
+      background: #fff;
+      border-color: #fff;
+    }
+
+    .focusable:focus-visible.opt-row {
+      outline: 2px solid rgba(255, 255, 255, 0.7);
+      outline-offset: 2px;
+    }
+
+    .edit-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .edit-actions button { flex: 1; }
+
+    .hidden-view { display: none !important; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .wheel-rotor { transition: none !important; }
+      .winner-chip, .winner-sub { animation: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+
+    <!-- MAIN VIEW -->
+    <section id="mainView">
+      <h1 id="appName">Rolunchete</h1>
+
+      <div class="wheel-stage">
+        <div class="pointer" aria-hidden="true"></div>
+        <svg id="wheel" viewBox="0 0 300 300" role="img" aria-label="Lunch roulette wheel">
+          <g class="wheel-rotor" id="rotor"></g>
+        </svg>
+      </div>
+
+      <div class="winner-area" id="winnerArea" aria-live="polite"></div>
+
+      <div class="actions">
+        <button class="btn-primary focusable" id="spinBtn">Spin</button>
+        <button class="btn-secondary focusable" id="editBtn">Edit options</button>
+      </div>
+    </section>
+
+    <!-- EDIT VIEW -->
+    <section id="editView" class="hidden-view">
+      <div class="edit-title">Pick options</div>
+      <div class="field-label"><span class="edit-count" id="editCount">0 selected</span></div>
+
+      <div class="options-list" id="optionsList"></div>
+
+      <div class="edit-actions">
+        <button class="btn-secondary focusable" id="cancelBtn">Cancel</button>
+        <button class="btn-primary focusable" id="saveBtn" style="font-size:0.9rem;padding:10px 0">Save</button>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    // ---------- CONFIG ----------
+    const PALETTE = [
+      { fill: '#FF4B3A', text: '#111' },
+      { fill: '#FFB020', text: '#111' },
+      { fill: '#3EBE6F', text: '#111' },
+      { fill: '#FF3D9A', text: '#111' },
+      { fill: '#6B6BF0', text: '#111' },
+      { fill: '#FF7440', text: '#111' },
+      { fill: '#A855F7', text: '#111' },
+      { fill: '#F5E642', text: '#111' },
+    ];
+    const MIN_OPTIONS = 2;
+    const MAX_OPTIONS = 12;
+
+    // Catalog of cuisines to pick from (no typing on the glasses).
+    const CATALOG = [
+      'MEXICAN', 'INDIAN', 'ARGENTINIAN', 'GREEK', 'PIZZA', 'SUSHI',
+      'VENEZUELAN', 'BURGER', 'THAI', 'RAMEN', 'TACOS', 'CHINESE',
+      'ITALIAN', 'KOREAN', 'POKE', 'VEGAN', 'SALAD', 'SANDWICH',
+      'FALAFEL', 'BBQ',
+    ];
+
+    let state = {
+      name: 'Rolunchete',
+      options: ['MEXICAN', 'INDIAN', 'ARGENTINIAN', 'GREEK', 'PIZZA', 'SUSHI', 'VENEZUELAN', 'BURGER'],
+    };
+
+    let totalRotation = 0;   // accumulated — never reset between spins
+    let spinning = false;
+
+    // ---------- DOM ----------
+    const mainView = document.getElementById('mainView');
+    const editView = document.getElementById('editView');
+    const appNameEl = document.getElementById('appName');
+    const rotor = document.getElementById('rotor');
+    const winnerArea = document.getElementById('winnerArea');
+    const spinBtn = document.getElementById('spinBtn');
+    const editBtn = document.getElementById('editBtn');
+    const optionsList = document.getElementById('optionsList');
+    const editCount = document.getElementById('editCount');
+    const cancelBtn = document.getElementById('cancelBtn');
+    const saveBtn = document.getElementById('saveBtn');
+
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const CX = 150, CY = 150, R = 148;
+
+    function colorFor(i) { return PALETTE[i % PALETTE.length]; }
+
+    function fontSizeFor(label) {
+      const n = label.length;
+      if (n <= 6) return 15;
+      if (n <= 9) return 13;
+      return 11;
+    }
+
+    // polar → cartesian (0° at top, clockwise)
+    function pt(angleDeg, radius) {
+      const rad = (angleDeg - 90) * Math.PI / 180;
+      return [CX + radius * Math.cos(rad), CY + radius * Math.sin(rad)];
+    }
+
+    // ---------- WHEEL RENDER ----------
+    function renderWheel() {
+      appNameEl.textContent = state.name || ' ';
+      rotor.textContent = '';
+
+      const n = state.options.length;
+      const segAngle = 360 / n;
+
+      state.options.forEach((label, i) => {
+        const start = i * segAngle;
+        const end = start + segAngle;
+        const mid = start + segAngle / 2;
+        const color = colorFor(i);
+
+        // segment wedge
+        const [x1, y1] = pt(start, R);
+        const [x2, y2] = pt(end, R);
+        const largeArc = segAngle > 180 ? 1 : 0;
+        const path = document.createElementNS(SVG_NS, 'path');
+        path.setAttribute('d',
+          `M ${CX} ${CY} L ${x1.toFixed(3)} ${y1.toFixed(3)} ` +
+          `A ${R} ${R} 0 ${largeArc} 1 ${x2.toFixed(3)} ${y2.toFixed(3)} Z`);
+        path.setAttribute('fill', color.fill);
+        path.setAttribute('stroke', '#080808');
+        path.setAttribute('stroke-width', '1.5');
+        rotor.appendChild(path);
+
+        // two decorative dots near outer edge, at 18% and 82% along arc
+        [0.18, 0.82].forEach(frac => {
+          const a = start + segAngle * frac;
+          const [dx, dy] = pt(a, R * 0.86);
+          const dot = document.createElementNS(SVG_NS, 'circle');
+          dot.setAttribute('cx', dx.toFixed(3));
+          dot.setAttribute('cy', dy.toFixed(3));
+          dot.setAttribute('r', '5');
+          dot.setAttribute('fill', '#000');
+          dot.setAttribute('opacity', '0.38');
+          rotor.appendChild(dot);
+        });
+
+        // radial label — points from center outward
+        const labelRadius = R * 0.58;
+        const [lx, ly] = pt(mid, labelRadius);
+        const text = document.createElementNS(SVG_NS, 'text');
+        text.setAttribute('class', 'seg-label');
+        text.setAttribute('x', lx.toFixed(3));
+        text.setAttribute('y', ly.toFixed(3));
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('fill', color.text);
+        text.setAttribute('font-size', fontSizeFor(label));
+        text.setAttribute('transform', `rotate(${(mid - 90).toFixed(3)} ${lx.toFixed(3)} ${ly.toFixed(3)})`);
+        text.textContent = label;
+        rotor.appendChild(text);
+      });
+
+      // center hub
+      const hubRing = document.createElementNS(SVG_NS, 'circle');
+      hubRing.setAttribute('cx', CX);
+      hubRing.setAttribute('cy', CY);
+      hubRing.setAttribute('r', '22');
+      hubRing.setAttribute('fill', '#080808');
+      hubRing.setAttribute('stroke', 'rgba(255,255,255,0.5)');
+      hubRing.setAttribute('stroke-width', '1.5');
+      rotor.appendChild(hubRing);
+
+      const hubDot = document.createElementNS(SVG_NS, 'circle');
+      hubDot.setAttribute('cx', CX);
+      hubDot.setAttribute('cy', CY);
+      hubDot.setAttribute('r', '4');
+      hubDot.setAttribute('fill', 'rgba(255,255,255,0.8)');
+      rotor.appendChild(hubDot);
+    }
+
+    function applyRotation() {
+      rotor.style.transform = `rotate(${totalRotation}deg)`;
+    }
+
+    // ---------- SPIN ----------
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function spin() {
+      if (spinning) return;
+      spinning = true;
+      spinBtn.disabled = true;
+      spinBtn.textContent = '···';
+      winnerArea.innerHTML = '';
+
+      const fullTurns = randInt(5, 9);
+      const extra = Math.random() * 360;
+      totalRotation += fullTurns * 360 + extra;
+      applyRotation();
+
+      setTimeout(() => {
+        spinning = false;
+        spinBtn.disabled = false;
+        spinBtn.textContent = 'Spin';
+        showWinner();
+      }, 4600);
+    }
+
+    function showWinner() {
+      const n = state.options.length;
+      const segAngle = 360 / n;
+      const mod = totalRotation % 360;
+      const effectiveAngle = (360 - mod) % 360;
+      const winIndex = Math.floor(effectiveAngle / segAngle) % n;
+
+      const label = state.options[winIndex];
+      const color = colorFor(winIndex);
+
+      const chip = document.createElement('div');
+      chip.className = 'winner-chip';
+      chip.style.background = color.fill;
+      chip.style.color = color.text;
+      chip.textContent = label;
+
+      const sub = document.createElement('div');
+      sub.className = 'winner-sub';
+      sub.textContent = "Today's lunch";
+
+      winnerArea.appendChild(chip);
+      winnerArea.appendChild(sub);
+    }
+
+    // ---------- EDIT MODE (catalog of toggles, no typing) ----------
+    let selected = null;   // Set of chosen cuisine names while editing
+
+    function openEdit() {
+      selected = new Set(state.options);
+      renderCatalog();
+      mainView.classList.add('hidden-view');
+      editView.classList.remove('hidden-view');
+      const first = optionsList.querySelector('.opt-row');
+      if (first) first.focus();
+    }
+
+    function renderCatalog() {
+      optionsList.textContent = '';
+
+      CATALOG.forEach((name, i) => {
+        const on = selected.has(name);
+        const atMax = selected.size >= MAX_OPTIONS;
+        const atMin = selected.size <= MIN_OPTIONS;
+        // an off row that can't be turned on (would exceed max), or
+        // an on row that can't be turned off (would drop below min)
+        const locked = (!on && atMax) || (on && atMin);
+
+        const row = document.createElement('div');
+        row.className = 'opt-row focusable' + (on ? ' on' : '') + (locked ? ' disabled-toggle' : '');
+        row.tabIndex = 0;
+        row.setAttribute('role', 'checkbox');
+        row.setAttribute('aria-checked', on ? 'true' : 'false');
+
+        const swatch = document.createElement('span');
+        swatch.className = 'swatch';
+        // color preview = position it would take in the wheel
+        swatch.style.background = colorFor(i).fill;
+
+        const label = document.createElement('span');
+        label.className = 'opt-name';
+        label.textContent = name;
+
+        const check = document.createElement('span');
+        check.className = 'opt-check';
+        check.textContent = on ? '✓' : '';
+
+        row.appendChild(swatch);
+        row.appendChild(label);
+        row.appendChild(check);
+
+        row.addEventListener('click', () => toggleOption(name));
+        optionsList.appendChild(row);
+      });
+
+      updateCount();
+    }
+
+    function toggleOption(name) {
+      if (selected.has(name)) {
+        if (selected.size <= MIN_OPTIONS) return;   // keep at least MIN
+        selected.delete(name);
+      } else {
+        if (selected.size >= MAX_OPTIONS) return;   // cap at MAX
+        selected.add(name);
+      }
+      // re-render to refresh locked states across all rows, keeping focus
+      const focusedIdx = getFocusables().indexOf(document.activeElement);
+      renderCatalog();
+      const items = getFocusables();
+      if (focusedIdx >= 0 && items[focusedIdx]) items[focusedIdx].focus();
+    }
+
+    function updateCount() {
+      const n = selected.size;
+      editCount.textContent = n + ' selected · min ' + MIN_OPTIONS + ', max ' + MAX_OPTIONS;
+      editCount.classList.toggle('warn', n >= MAX_OPTIONS);
+    }
+
+    function saveEdit() {
+      // preserve catalog order so the wheel layout is stable
+      state.options = CATALOG.filter(c => selected.has(c));
+
+      totalRotation = 0;   // reset spin history on save
+      applyRotation();
+      winnerArea.innerHTML = '';
+      renderWheel();
+
+      closeEdit();
+    }
+
+    function cancelEdit() {
+      selected = null;
+      closeEdit();
+    }
+
+    function closeEdit() {
+      editView.classList.add('hidden-view');
+      mainView.classList.remove('hidden-view');
+      spinBtn.focus();
+    }
+
+    // ---------- D-PAD NAV ----------
+    function getFocusables() {
+      const view = editView.classList.contains('hidden-view') ? mainView : editView;
+      return Array.from(view.querySelectorAll('.focusable'))
+        .filter(el => !el.disabled && el.offsetParent !== null);
+    }
+
+    function moveFocus(dir) {
+      const items = getFocusables();
+      if (!items.length) return;
+      const idx = items.indexOf(document.activeElement);
+      let next = idx + dir;
+      if (next < 0) next = items.length - 1;
+      if (next >= items.length) next = 0;
+      items[next].focus();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      switch (e.key) {
+        case 'ArrowDown':
+        case 'ArrowRight':
+          e.preventDefault(); moveFocus(1); break;
+        case 'ArrowUp':
+        case 'ArrowLeft':
+          e.preventDefault(); moveFocus(-1); break;
+        case 'Enter': {
+          const el = document.activeElement;
+          // buttons and catalog rows both respond to Enter
+          if (el && (el.tagName === 'BUTTON' || el.classList.contains('opt-row'))) {
+            e.preventDefault();
+            el.click();
+          }
+          break;
+        }
+      }
+    });
+
+    // ---------- WIRE UP ----------
+    spinBtn.addEventListener('click', spin);
+    editBtn.addEventListener('click', openEdit);
+    cancelBtn.addEventListener('click', cancelEdit);
+    saveBtn.addEventListener('click', saveEdit);
+
+    // ---------- INIT ----------
+    renderWheel();
+    applyRotation();
+    spinBtn.focus();   // Enter spins right away
+  </script>
+</body>
+</html>

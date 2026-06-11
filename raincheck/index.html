@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no" />
+  <title>Raincheck</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
+
+  <!-- ===========================================================
+       STEP 1 — PICK  (favorites + "search a city")
+       =========================================================== -->
+  <section id="step-pick" class="screen">
+    <header class="step-head">
+      <span class="step-title">RAINCHECK</span>
+      <span class="step-hint mono">▲▼ · ENTER</span>
+    </header>
+    <div class="list-wrap">
+      <div class="list" id="pick-list"><!-- rows injected by JS --></div>
+    </div>
+  </section>
+
+  <!-- ===========================================================
+       STEP 2 — SEARCH  (on-screen D-pad keyboard + live results)
+       =========================================================== -->
+  <section id="step-search" class="screen hidden">
+    <header class="step-head">
+      <span class="step-title">SEARCH</span>
+      <span class="step-hint mono" id="search-hint">◀ BACK</span>
+    </header>
+
+    <div class="query-bar">
+      <span class="query-text mono" id="query-text"></span><span class="query-caret">_</span>
+    </div>
+
+    <!-- live results once 2+ letters are typed -->
+    <div class="results" id="results"><!-- rows injected by JS --></div>
+
+    <!-- on-screen keyboard -->
+    <div class="keyboard" id="keyboard"><!-- keys injected by JS --></div>
+  </section>
+
+  <!-- ===========================================================
+       STEP 3 — VERDICT
+       =========================================================== -->
+  <section id="result" class="screen hidden">
+    <header class="result-head">
+      <span class="result-place" id="r-place">—</span>
+      <span class="result-clock mono" id="r-clock">—:—</span>
+    </header>
+
+    <div class="verdict" id="verdict">
+      <div class="verdict-icon" id="v-icon"><!-- SVG injected by JS --></div>
+      <div class="verdict-text" id="v-text">LOADING</div>
+      <div class="verdict-sub mono" id="v-sub">checking the weather</div>
+    </div>
+
+    <div class="bands" id="bands">
+      <div class="band" data-band="morning">
+        <div class="band-when">MORNING</div>
+        <div class="band-pct mono" id="b-morning-pct">—</div>
+        <div class="band-meta mono" id="b-morning-meta">—</div>
+      </div>
+      <div class="band" data-band="afternoon">
+        <div class="band-when">AFTERNOON</div>
+        <div class="band-pct mono" id="b-afternoon-pct">—</div>
+        <div class="band-meta mono" id="b-afternoon-meta">—</div>
+      </div>
+      <div class="band" data-band="evening">
+        <div class="band-when">EVENING</div>
+        <div class="band-pct mono" id="b-evening-pct">—</div>
+        <div class="band-meta mono" id="b-evening-meta">—</div>
+      </div>
+    </div>
+
+    <div class="result-foot">
+      <button class="foot-btn star-btn focusable" id="star-btn"><span class="star-ico" id="star-ico">☆</span><span id="star-label">SAVE</span></button>
+      <button class="foot-btn focusable" id="change-btn">CHANGE&nbsp;CITY</button>
+    </div>
+  </section>
+
+</div>
+<script src="app.js"></script>
+</body>
+</html>

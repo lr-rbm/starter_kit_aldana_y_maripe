@@ -1,5 +1,18 @@
 # {{NAME}}'s Starter Kit — Build Apps for Meta Ray-Ban Display Glasses
 
+## Apps by Aldana & MP
+
+Apps we built in this kit:
+
+| App | What it does | Live |
+|---|---|---|
+| [Raincheck](raincheck/) | Will it rain today? Day verdict plus morning/afternoon/evening bands for any city | [raincheck-nine.vercel.app](https://raincheck-nine.vercel.app) |
+| [Pepe of the Day](pepe-of-the-day/) | A fresh Pepe served once a day | [pepe-of-the-day.vercel.app](https://pepe-of-the-day.vercel.app) |
+| [Rolunchete](rolunchete/) | Spin-the-wheel decider for picking from your own options | [rolunchete.vercel.app](https://rolunchete.vercel.app) |
+| [Ballsy 8](ballsy-8/) | Magic 8-ball — ask a question, get an answer | [ballsy-8.vercel.app](https://ballsy-8.vercel.app) |
+
+---
+
 Hi {{NAME}}! 👋
 
 This is a personal starter kit so you can build small web apps for the [Meta Ray-Ban Display glasses](https://wearables.developer.meta.com/docs) just by **describing your idea to Claude**. No coding required. Works on both **Mac** and **Windows**.
@@ -122,19 +135,6 @@ Claude will update the code and redeploy. You'll get a new URL (or the same one 
 - **Black is transparent.** Anything you don't draw is see-through on the glasses. Bright, simple shapes pop best.
 - **Ask for variations.** *"Show me 3 different layouts for this"* — Claude can iterate fast.
 - **Steal from the gallery below.** Tell Claude *"build something like dad-jokes but with Chuck Norris jokes"* and it'll mirror that demo's style.
-
----
-
-## By MP and Aldana
-
-Apps we built in this kit:
-
-| App | What it does | Live |
-|---|---|---|
-| [Raincheck](raincheck/) | Will it rain today? Day verdict plus morning/afternoon/evening bands for any city | [raincheck-nine.vercel.app](https://raincheck-nine.vercel.app) |
-| [Pepe of the Day](pepe-of-the-day/) | A fresh Pepe served once a day | [pepe-of-the-day.vercel.app](https://pepe-of-the-day.vercel.app) |
-| [Rolunchete](rolunchete/) | Spin-the-wheel decider for picking from your own options | [rolunchete.vercel.app](https://rolunchete.vercel.app) |
-| [Ballsy 8](ballsy-8/) | Magic 8-ball — ask a question, get an answer | [ballsy-8.vercel.app](https://ballsy-8.vercel.app) |
 
 ---
 

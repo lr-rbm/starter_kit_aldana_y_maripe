@@ -106,7 +106,8 @@ const state = {
   searchSeq: 0,         // guards against out-of-order async responses
 
   currentPlace: null,   // the place shown on the result screen
-  footIdx: 0,           // foot buttons: 0 = star, 1 = refresh, 2 = change-city
+  footIdx: 0,           // foot buttons: 0 = star, 1 = refresh/retry, 2 = change-city
+  loadError: false,     // true while the last fetch failed and we have no fresh data
 };
 
 // ============================================================
@@ -354,6 +355,12 @@ function updateStar() {
 
 const FOOT_BTNS = () => [$("star-btn"), $("refresh-btn"), $("change-btn")];
 
+// the middle button reads RETRY while we're stuck on an error, REFRESH otherwise
+function renderFoot() {
+  $("refresh-label").textContent = state.loadError ? "RETRY" : "REFRESH";
+  $("refresh-btn").classList.toggle("is-retry", state.loadError);
+}
+
 function highlightFoot() {
   const btns = FOOT_BTNS();
   btns.forEach((b, i) => b.classList.toggle("foot-focus", i === state.footIdx));
@@ -544,6 +551,8 @@ $("result").querySelector(".result-foot").addEventListener("mousemove", (e) => {
 function resetResult() {
   cityOffsetSec = null; // clear stale clock until the new city's forecast loads
   lastForecastDate = null; lastUpdatedAt = null;
+  state.loadError = false;
+  renderFoot();
   tick();
   $("r-date").textContent = "—";
   $("r-date").classList.remove("stale");
@@ -568,27 +577,55 @@ async function fetchWeather(place) {
     `&hourly=precipitation_probability,temperature_2m` +
     `&forecast_days=1&timezone=${encodeURIComponent(tz)}`;
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("HTTP " + res.status);
+    if (!navigator.onLine) { const e = new Error("offline"); e.kind = "offline"; throw e; }
+    let res;
+    try {
+      res = await fetch(url);
+    } catch (netErr) {
+      const e = new Error("network"); e.kind = "offline"; throw e; // fetch threw → no network
+    }
+    if (!res.ok) { const e = new Error("HTTP " + res.status); e.kind = "service"; throw e; }
     const data = await res.json();
     cityOffsetSec = typeof data.utc_offset_seconds === "number" ? data.utc_offset_seconds : null;
     // forecast date comes from the data itself (city-local), e.g. "2026-06-12"
     lastForecastDate = (data.hourly && data.hourly.time && data.hourly.time[0])
       ? data.hourly.time[0].slice(0, 10) : null;
     lastUpdatedAt = Date.now();
+    state.loadError = false;
     tick();
     renderMeta();
     render(data.hourly);
+    renderFoot();
   } catch (err) {
-    $("verdict").className = "verdict";
-    $("v-icon").innerHTML = ICONS.warn;
-    $("v-text").textContent = "NO DATA";
-    $("v-sub").textContent = "couldn't reach the weather service";
-    $("r-updated").textContent = "update failed";
+    showFetchError(err.kind === "offline" ? "offline" : "service");
   }
 }
 
-// re-fetch the forecast for the city currently shown (manual ↻ or auto)
+// Show an error. If we already had a good forecast, KEEP it on screen and only
+// note the failure in the meta line. Only blank out to a full error state when
+// there was never any data to begin with.
+function showFetchError(kind) {
+  const hadData = lastUpdatedAt != null;
+  if (hadData) {
+    // keep the last forecast; just flag it in the meta line
+    renderMeta();
+    const tag = kind === "offline" ? "offline" : "update failed";
+    const prev = $("r-updated").textContent.replace(/^(offline|update failed) · /, "");
+    $("r-updated").textContent = `${tag} · ${prev}`;
+    state.loadError = false; // data still valid, foot keeps normal REFRESH
+  } else {
+    state.loadError = true;
+    $("verdict").className = "verdict";
+    $("v-icon").innerHTML = ICONS.warn;
+    $("v-text").textContent = kind === "offline" ? "YOU'RE OFFLINE" : "SERVICE ERROR";
+    $("v-sub").textContent = kind === "offline"
+      ? "no network connection" : "the weather service failed";
+    $("r-updated").textContent = kind === "offline" ? "offline" : "update failed";
+  }
+  renderFoot();
+}
+
+// re-fetch the forecast for the city currently shown (manual ↻/retry or auto)
 function refreshWeather() {
   if (!state.currentPlace) return;
   $("r-updated").textContent = "updating…";

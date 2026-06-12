@@ -289,6 +289,9 @@ html, body {
 .result-meta .meta-sep { opacity: 0.5; }
 .result-meta #r-date.stale { color: var(--dry); }   /* not today → amber warning */
 .refresh-ico { font-size: 16px; margin-right: 6px; display: inline-block; }
+/* middle button turns amber when it's a RETRY after a failed load */
+.foot-btn.is-retry { color: var(--dry); }
+.foot-btn.is-retry .refresh-ico { color: var(--dry); }
 
 .verdict {
   flex: 1;

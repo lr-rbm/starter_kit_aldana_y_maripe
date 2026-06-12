@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no" />
+  <title>Humans in Space</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- floating astronauts live here, one per human in space -->
+    <div id="float-layer" aria-hidden="true"></div>
+
+    <!-- SCREEN 1: the count -->
+    <section id="count-screen" class="screen is-active">
+      <div class="kicker">RIGHT NOW</div>
+
+      <!-- center slot: loading message, then the big number -->
+      <div class="center-slot">
+        <div class="loading-msg" id="loadingMsg"><span class="type-text" id="typeText"></span><span class="cursor">▌</span></div>
+        <div class="big-number" id="bigNumber" hidden></div>
+
+        <!-- error -->
+        <div class="error-box" id="errorBox" hidden>
+          <div class="error-msg">Couldn't reach orbit right now.</div>
+          <button class="retry-btn" id="retryBtn">
+            <span class="retry-label">TRY AGAIN</span>
+            <span class="retry-key"><span class="key">Enter</span></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="caption" id="caption">HUMANS IN SPACE</div>
+      <div class="updated" id="updated" hidden></div>
+    </section>
+
+    <!-- SCREEN 2: who's up there -->
+    <section id="list-screen" class="screen">
+      <div class="list-head">
+        <span class="list-title">WHO'S UP THERE</span>
+        <span class="list-count" id="listCount"></span>
+      </div>
+      <div class="crew-cols">
+        <span class="col-flag">COUNTRY</span>
+        <span class="col-name">NAME</span>
+        <span class="col-craft">CRAFT</span>
+      </div>
+      <ul class="crew" id="crew"></ul>
+    </section>
+
+    <div class="hints" id="hints" hidden>
+      <button class="hint" id="flipHint"><span class="key">◀ ▶</span>&nbsp;FLIP</button>
+      <button class="hint" id="scrollHint" hidden><span class="key">▲ ▼</span>&nbsp;SCROLL</button>
+    </div>
+
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

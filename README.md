@@ -10,6 +10,7 @@ Apps we built in this kit:
 | [Pepe of the Day](pepe-of-the-day/) | A fresh Pepe served once a day | [pepe-of-the-day.vercel.app](https://pepe-of-the-day.vercel.app) |
 | [Rolunchete](rolunchete/) | Spin-the-wheel decider for picking from your own options | [rolunchete.vercel.app](https://rolunchete.vercel.app) |
 | [Ballsy 8](ballsy-8/) | Magic 8-ball — ask a question, get an answer | [ballsy-8.vercel.app](https://ballsy-8.vercel.app) |
+| [Humans in Space](humans-in-space/) | How many people are in space right now, floating around with their names and craft | [humans-in-space.vercel.app](https://humans-in-space.vercel.app) |
 | [Quick Timer](quick-timer/) | Tap a preset (1/2/5/10/15 min) or dial a custom time, then count down with a progress ring | [quick-timer.vercel.app](https://quick-timer.vercel.app) |
 
 ---

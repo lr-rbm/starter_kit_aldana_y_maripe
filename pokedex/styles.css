@@ -1,0 +1,545 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #000;
+  --fg: #fff;
+  --dim: #8a93a6;
+  --accent: #ffcb05;        /* Pokémon yellow — re-set per Pokémon by JS */
+}
+
+html, body {
+  width: 600px;
+  height: 600px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  overflow: hidden;
+}
+
+#app {
+  position: relative;
+  width: 600px;
+  height: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+[hidden] { display: none !important; }
+
+/* The 600×600 canvas is fixed for the glasses. On a narrower screen (phone),
+   a tiny inline script sets --fit = viewportWidth/600 and we zoom the canvas to
+   match — pixel-identical composition, just scaled to fit the width. */
+body { zoom: var(--fit, 1); }
+
+/* ---- screens (menu / gen / favs) ---- */
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+}
+.screen.is-active { display: flex; }
+
+.brand {
+  font-size: 56px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-shadow: 0 0 36px color-mix(in srgb, var(--accent) 55%, transparent);
+  margin-bottom: 50px;
+}
+
+.menu-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+.menu-item {
+  font-size: 30px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--dim);
+  padding: 10px 28px;
+  border: 2px solid transparent;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+.menu-item.is-active {
+  color: var(--fg);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.fav-count { font-family: "JetBrains Mono", monospace; font-size: 20px; color: var(--dim); }
+
+.menu-hint {
+  position: absolute;
+  bottom: 26px;
+  left: 0; right: 0;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+}
+
+/* generation picker */
+.gen-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 16px;
+  letter-spacing: 0.3em;
+  color: var(--dim);
+  margin-bottom: 16px;
+}
+.gen-value {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 44px;
+}
+.gen-value #genName { min-width: 300px; }
+.gen-arrow { color: var(--accent); font-size: 22px; cursor: pointer; padding: 4px 10px; }
+
+/* favorites list */
+.favs-title {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 22px;
+  letter-spacing: 0.25em;
+  color: var(--accent);
+  margin-bottom: 22px;
+}
+.fav-tiles {
+  list-style: none;
+  width: 100%;
+  max-width: 460px;
+  max-height: 420px;
+  overflow-y: auto;
+  scrollbar-width: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.fav-tiles::-webkit-scrollbar { display: none; }
+.fav-tile {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 8px 16px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  cursor: pointer;
+}
+.fav-tile.is-active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+}
+.fav-tile img { width: 64px; height: 64px; object-fit: contain; flex-shrink: 0; }
+.fav-tile-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+  flex-shrink: 0;
+}
+.fav-tile-name {
+  font-size: 24px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.favs-empty { font-size: 24px; line-height: 1.5; color: var(--dim); }
+.favs-empty-sub { font-size: 18px; }
+
+/* ---- card ---- */
+.card {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 28px 40px 80px;
+}
+
+.card-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.dex-num {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 22px;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+}
+.dex-name {
+  font-size: 38px;
+  font-weight: 700;
+  text-transform: capitalize;
+  text-shadow: 0 0 28px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+.fav-star {
+  font-size: 26px;
+  color: var(--accent);
+  cursor: pointer;
+  text-shadow: 0 0 16px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+.types {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
+}
+.type-chip {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 999px;
+  color: #000;
+}
+
+/* ---- sprite ---- */
+.sprite-wrap {
+  position: relative;
+  width: 280px;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 6px 0;
+}
+.sprite {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  image-rendering: auto;
+  filter: drop-shadow(0 0 30px color-mix(in srgb, var(--accent) 35%, transparent));
+  transition: opacity 0.18s ease;
+}
+.sprite.is-swapping { opacity: 0; }
+
+.cry-btn {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 14%, #000);
+  color: var(--accent);
+  font-size: 22px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cry-btn:active { transform: scale(0.92); }
+.cry-btn.is-playing { animation: cryPulse 0.6s ease-in-out infinite; }
+@keyframes cryPulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent); }
+  50%      { box-shadow: 0 0 0 10px transparent; }
+}
+/* "Enter" label hangs off the bottom-right of the ♪ button, like a subscript:
+   shares the button's bottom edge, sits to the right of the circle */
+.cry-key {
+  position: absolute;
+  bottom: 0;
+  left: 100%;
+  margin-left: 6px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  color: var(--dim);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.cry-key .key { padding: 2px 6px; font-size: 12px; }
+
+/* ---- views ---- */
+.view {
+  width: 100%;
+  max-width: 420px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* stats as bars */
+.stats { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+.stat-row {
+  display: grid;
+  grid-template-columns: 92px 34px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+.stat-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+}
+.stat-val {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: right;
+}
+.stat-bar {
+  height: 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+.stat-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+  width: 0;
+  transition: width 0.4s ease;
+}
+
+/* physical */
+.physical { display: flex; flex-direction: column; gap: 14px; }
+.phys-row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 12px;
+}
+.phys-row dt {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+  width: 120px;
+  flex-shrink: 0;
+}
+.phys-row dd { font-size: 22px; font-weight: 500; }
+.phys-row.abilities dd { font-size: 18px; text-transform: capitalize; line-height: 1.4; }
+
+/* flavor */
+.flavor {
+  font-size: 22px;
+  line-height: 1.5;
+  text-align: center;
+  color: #e8ecf4;
+}
+
+/* view indicator — vertical bars on the right edge, on the ▲▼ axis */
+.view-dots {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.view-dots .dot {
+  width: 5px;
+  height: 26px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  transition: background 0.25s ease, box-shadow 0.25s ease;
+}
+.view-dots .dot.is-active {
+  background: var(--accent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+
+/* ---- hints ---- */
+.hints {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 26px;
+  padding: 14px 0 14px;
+  background: linear-gradient(to top, #000 70%, transparent);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 15px;
+  color: var(--dim);
+}
+
+/* corner hint — top-left, where you'd naturally look to go back. the "hold"
+   tag hangs small under the key, overlapping it, so the gesture reads as part
+   of the button instead of a separate "HOLD" word beside it. */
+.corner-hint {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: rgba(138, 147, 166, 0.72);
+}
+.hold-chip {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 7px;
+}
+.hold-chip-tag {
+  position: absolute;
+  bottom: -3px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: #000;
+}
+
+/* the Enter hint shows both what tap and hold do, stacked next to the chip */
+.enter-hint { align-items: center; }
+.enter-hold { color: var(--accent); }
+.hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none; border: none;
+  color: inherit; font: inherit;
+  cursor: pointer;
+  padding: 6px 4px;
+}
+.key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  line-height: 1;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  color: var(--fg);
+}
+/* triangle glyphs sit optically low in their em box — nudge them to center */
+.key .arrow { display: inline-block; transform: translateY(-1px); }
+
+/* ---- loading ---- */
+.loading-msg {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  white-space: nowrap;
+  animation: breathe 2.2s ease-in-out infinite;
+}
+.cursor { display: inline-block; margin-left: 2px; animation: blink 0.8s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes breathe {
+  0%, 100% { opacity: 0.55; text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 30%, transparent); }
+  50%      { opacity: 1;    text-shadow: 0 0 28px color-mix(in srgb, var(--accent) 70%, transparent); }
+}
+
+/* ---- error ---- */
+.error-box { display: flex; flex-direction: column; align-items: center; }
+.error-msg { font-size: 28px; font-weight: 500; margin-bottom: 30px; text-align: center; }
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 26px;
+  background: color-mix(in srgb, var(--accent) 12%, #000);
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  color: var(--fg);
+  cursor: pointer;
+  font-family: inherit;
+  animation: pulse 1.8s ease-in-out infinite;
+}
+.retry-label { font-size: 22px; font-weight: 600; letter-spacing: 0.08em; }
+.retry-key { font-family: "JetBrains Mono", monospace; font-size: 15px; color: var(--dim); }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent); }
+  50%      { box-shadow: 0 0 0 8px transparent; }
+}
+
+/* ---- mute toggle ---- */
+.mute-corner {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.mute-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.mute-btn.is-muted { opacity: 0.5; }
+/* gesture hint under the icon — shown on the card while muted (double-tap to enable) */
+.mute-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: rgba(138, 147, 166, 0.75);
+  white-space: nowrap;
+}
+.mute-hint .key { padding: 1px 5px; font-size: 10px; }
+
+/* ---- long-press toast (hold ◀ = menu / hold Enter = favorite) ---- */
+.hold-toast {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #000;
+  border: 2px solid var(--accent);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  overflow: hidden;
+}
+/* the fill sweeps across over the hold duration as a progress cue */
+.hold-toast::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+/* 480ms = HOLD_MS (700) − TAP_WINDOW (220): the bar fills over exactly the time
+   the toast is on screen, completing right as the hold action fires. */
+.hold-toast.filling::before { animation: holdfill 480ms linear forwards; }
+.hold-toast > span { position: relative; }
+@keyframes holdfill { to { transform: scaleX(1); } }

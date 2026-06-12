@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Pokédex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+  <script>
+    // Fit the fixed 600×600 canvas to narrow screens (phones). On the glasses
+    // the viewport is 600, so the factor is 1 and nothing changes.
+    (function fit() {
+      var f = Math.min(1, window.innerWidth / 600);
+      document.documentElement.style.setProperty("--fit", f);
+    })();
+    addEventListener("resize", function () {
+      document.documentElement.style.setProperty("--fit", Math.min(1, innerWidth / 600));
+    });
+  </script>
+</head>
+<body>
+  <div id="app">
+
+    <!-- global mute toggle, on every screen -->
+    <div class="mute-corner">
+      <button class="mute-btn" id="muteBtn" title="Sound on/off" aria-label="Sound on/off">🔊</button>
+      <span class="mute-hint" id="muteHint" hidden></span>
+    </div>
+
+    <!-- global long-press progress toast (hold ◀ = back, hold Enter = save, hold ▲ = sound) -->
+    <div class="hold-toast" id="holdToast" hidden><span id="holdLabel"></span></div>
+
+    <!-- MENU -->
+    <section id="menu" class="screen is-active">
+      <h1 class="brand">POKÉDEX</h1>
+      <ul class="menu-list" id="menuList">
+        <li class="menu-item is-active" data-go="gen">BROWSE</li>
+        <li class="menu-item" data-go="favs">FAVORITES <span class="fav-count" id="menuFavCount">(0)</span></li>
+      </ul>
+      <div class="menu-hint"><span class="key"><span class="arrow">▲ ▼</span></span>&nbsp;MOVE&nbsp;&nbsp;<span class="key">Enter</span>&nbsp;SELECT</div>
+    </section>
+
+    <!-- GENERATION PICKER -->
+    <section id="gen" class="screen">
+      <div class="corner-hint corner-hint--tl back-hint">
+        <span class="hold-chip"><span class="key"><span class="arrow">◀</span></span><span class="hold-chip-tag">hold</span></span>
+        <span class="corner-hint-label">BACK</span>
+      </div>
+      <span class="gen-label">GENERATION</span>
+      <div class="gen-value">
+        <span class="gen-arrow" data-gen-dir="-1">◀</span>
+        <span id="genName">KANTO · GEN 1</span>
+        <span class="gen-arrow" data-gen-dir="1">▶</span>
+      </div>
+      <ul class="menu-list" id="genList">
+        <li class="menu-item is-active" data-go="catalog">START</li>
+      </ul>
+      <div class="menu-hint"><span class="key"><span class="arrow">◀ ▶</span></span>&nbsp;GEN&nbsp;&nbsp;<span class="key">Enter</span>&nbsp;START</div>
+    </section>
+
+    <!-- LOADING -->
+    <div class="loading-msg" id="loadingMsg" hidden><span class="type-text" id="typeText"></span><span class="cursor">▌</span></div>
+
+    <!-- ERROR -->
+    <div class="error-box" id="errorBox" hidden>
+      <div class="error-msg">Couldn't reach the Pokédex.</div>
+      <button class="retry-btn" id="retryBtn">
+        <span class="retry-label">TRY AGAIN</span>
+        <span class="retry-key"><span class="key">Enter</span></span>
+      </button>
+    </div>
+
+    <!-- CARD (catalog + favorite detail) -->
+    <section id="card" class="card" hidden>
+      <!-- back lives top-left, hold ◀ (catalog → gen, favorite → favs) -->
+      <div class="corner-hint corner-hint--tl back-hint" id="cardBack">
+        <span class="hold-chip"><span class="key"><span class="arrow">◀</span></span><span class="hold-chip-tag">hold</span></span>
+        <span class="corner-hint-label">BACK</span>
+      </div>
+      <header class="card-head">
+        <span class="dex-num" id="dexNum">#001</span>
+        <span class="dex-name" id="dexName">bulbasaur</span>
+        <span class="fav-star" id="favStar" title="Favorite" hidden>★</span>
+        <span class="types" id="types"></span>
+      </header>
+
+      <div class="sprite-wrap">
+        <img class="sprite" id="sprite" alt="" />
+        <button class="cry-btn" id="cryBtn" title="Play cry (Enter)">
+          <span class="cry-icon">♪</span>
+          <span class="cry-key"><span class="key">Enter</span></span>
+        </button>
+      </div>
+
+      <!-- VIEW: stats -->
+      <div class="view view-stats" id="viewStats">
+        <ul class="stats" id="stats"></ul>
+      </div>
+
+      <!-- VIEW: physical -->
+      <div class="view view-physical" id="viewPhysical" hidden>
+        <dl class="physical">
+          <div class="phys-row"><dt>HEIGHT</dt><dd id="height">—</dd></div>
+          <div class="phys-row"><dt>WEIGHT</dt><dd id="weight">—</dd></div>
+          <div class="phys-row abilities"><dt>ABILITIES</dt><dd id="abilities">—</dd></div>
+        </dl>
+      </div>
+
+      <!-- VIEW: flavor -->
+      <div class="view view-flavor" id="viewFlavor" hidden>
+        <p class="flavor" id="flavor">—</p>
+      </div>
+
+      <div class="view-dots" id="viewDots">
+        <span class="dot is-active"></span><span class="dot"></span><span class="dot"></span>
+      </div>
+    </section>
+
+    <!-- FAVORITES LIST -->
+    <section id="favs" class="screen">
+      <div class="corner-hint corner-hint--tl back-hint">
+        <span class="hold-chip"><span class="key"><span class="arrow">◀</span></span><span class="hold-chip-tag">hold</span></span>
+        <span class="corner-hint-label">BACK</span>
+      </div>
+      <h2 class="favs-title">FAVORITES</h2>
+      <ul class="fav-tiles" id="favTiles"></ul>
+      <div class="favs-empty" id="favsEmpty" hidden>
+        No favorites yet.<br><span class="favs-empty-sub">Hold <span class="key">Enter</span> on a Pokémon to save it.</span>
+      </div>
+      <div class="menu-hint" id="favsHint"><span class="key"><span class="arrow">▲ ▼</span></span>&nbsp;MOVE&nbsp;&nbsp;<span class="key">Enter</span>&nbsp;OPEN</div>
+    </section>
+
+    <!-- bottom hints: browse, view, and the hold-Enter save (cry lives on the ♪ button) -->
+    <div class="hints" id="hints" hidden>
+      <span class="hint"><span class="key"><span class="arrow">◀ ▶</span></span>&nbsp;<span id="hintNav">BROWSE</span></span>
+      <span class="hint"><span class="key"><span class="arrow">▲ ▼</span></span>&nbsp;VIEW</span>
+      <span class="hint enter-hint">
+        <span class="hold-chip"><span class="key">Enter</span><span class="hold-chip-tag">hold</span></span>
+        <span class="enter-hold">★ SAVE</span>
+      </span>
+    </div>
+
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

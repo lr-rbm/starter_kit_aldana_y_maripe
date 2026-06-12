@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Who's That Pokémon?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+  <script>
+    // Fit the fixed 600×600 canvas to narrow screens (phones). On the glasses
+    // the viewport is 600, so the factor is 1 and nothing changes.
+    (function fit() {
+      var f = Math.min(1, window.innerWidth / 600);
+      document.documentElement.style.setProperty("--fit", f);
+    })();
+    addEventListener("resize", function () {
+      document.documentElement.style.setProperty("--fit", Math.min(1, innerWidth / 600));
+    });
+  </script>
+</head>
+<body>
+  <div id="app">
+
+    <!-- global mute toggle (top-right), with its gesture hint right below it -->
+    <div class="mute-corner">
+      <button class="mute-btn" id="muteBtn" title="Sound on/off" aria-label="Sound on/off">🔊</button>
+      <span class="mute-hint" id="muteHint"><span class="key"><span class="arrow">▲</span></span>&nbsp;HOLD</span>
+    </div>
+
+    <!-- long-press progress toast (hold ◀ = menu, hold ▲ = sound) -->
+    <div class="hold-toast" id="holdToast" hidden><span id="holdLabel"></span></div>
+
+    <!-- INTRO -->
+    <section id="intro" class="screen is-active">
+      <h1 class="title">WHO'S THAT<br><span class="title-accent">POKÉMON?</span></h1>
+      <div class="gen-picker">
+        <span class="gen-label">REGION</span>
+        <div class="gen-value" id="genValue">
+          <span class="gen-arrow">◀</span>
+          <span id="genName">KANTO · GEN 1</span>
+          <span class="gen-won" id="genWon" hidden>★</span>
+          <span class="gen-arrow">▶</span>
+        </div>
+        <span class="gen-count" id="genCount">151 POKÉMON</span>
+      </div>
+      <div class="start-cta">
+        <span class="key">Enter</span>&nbsp;START
+      </div>
+      <div class="score-line" id="introScore" hidden></div>
+    </section>
+
+    <!-- LOADING -->
+    <section id="loading" class="screen">
+      <div class="loading-msg"><span id="typeText"></span><span class="cursor">▌</span></div>
+    </section>
+
+    <!-- PLAYING -->
+    <section id="playing" class="screen">
+      <div class="timer-bar"><span class="timer-fill" id="timerFill"></span></div>
+      <div class="progress" id="progress">0 / 151</div>
+      <div class="lives" id="lives"></div>
+      <div class="silhouette-stage">
+        <img class="silhouette" id="silhouette" alt="" />
+      </div>
+      <div class="options" id="options">
+        <button class="option" data-i="0"></button>
+        <button class="option" data-i="1"></button>
+        <button class="option" data-i="2"></button>
+        <button class="option" data-i="3"></button>
+      </div>
+    </section>
+
+    <!-- REVEALED -->
+    <section id="revealed" class="screen">
+      <!-- back lives top-left, where you'd naturally look to go back -->
+      <div class="corner-hint corner-hint--tl back-hint">
+        <span class="hold-chip"><span class="key"><span class="arrow">◀</span></span><span class="hold-chip-tag">hold</span></span>
+        <span class="corner-hint-label">BACK</span>
+      </div>
+      <div class="verdict" id="verdict">CORRECT!</div>
+      <div class="reveal-stage">
+        <img class="reveal-silhouette" id="revealSilhouette" alt="" />
+        <img class="reveal-sprite" id="revealSprite" alt="" />
+      </div>
+      <div class="reveal-bottom">
+        <div class="reveal-name" id="revealName">—</div>
+        <div class="score-line" id="revealScore"></div>
+        <div class="next-cta"><span class="key">Enter</span>&nbsp;NEXT</div>
+      </div>
+    </section>
+
+    <!-- GAME OVER -->
+    <section id="gameover" class="screen">
+      <h2 class="gameover-title">GAME OVER</h2>
+      <div class="gameover-stats" id="gameoverStats"></div>
+      <div class="next-cta"><span class="key">Enter</span>&nbsp;PLAY AGAIN</div>
+    </section>
+
+    <!-- WIN -->
+    <section id="win" class="screen">
+      <div class="win-burst" aria-hidden="true"></div>
+      <img class="win-trophy" src="trophy.png" alt="Trophy" />
+      <h2 class="win-title">CONGRATULATIONS!</h2>
+      <div class="win-sub">YOU WON</div>
+      <div class="win-stats" id="winStats"></div>
+      <div class="next-cta">PRESS ANY KEY · MENU</div>
+    </section>
+
+    <!-- ERROR -->
+    <section id="error" class="screen">
+      <div class="error-msg">Couldn't reach the Pokédex.</div>
+      <button class="retry-btn" id="retryBtn">
+        <span class="retry-label">TRY AGAIN</span>
+        <span class="retry-key"><span class="key">Enter</span></span>
+      </button>
+    </section>
+
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

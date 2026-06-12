@@ -1,0 +1,499 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #000;
+  --fg: #fff;
+  --dim: #8a93a6;
+  --accent: #ffcb05;
+  --good: #7ac74c;
+  --bad: #ee5d50;
+}
+
+html, body {
+  width: 600px;
+  height: 600px;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  overflow: hidden;
+}
+
+#app { position: relative; width: 600px; height: 600px; }
+
+/* The 600×600 canvas is fixed for the glasses. On a narrower screen (phone),
+   a tiny inline script sets --fit = viewportWidth/600 and we zoom the canvas to
+   match — pixel-identical composition, just scaled to fit the width. */
+body { zoom: var(--fit, 1); }
+
+[hidden] { display: none !important; }
+
+.screen {
+  position: absolute;
+  inset: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+}
+.screen.is-active { display: flex; }
+
+/* ---- intro ---- */
+.title {
+  font-size: 58px;
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: 0.02em;
+}
+.title-accent {
+  color: var(--accent);
+  text-shadow: 0 0 32px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.gen-picker {
+  margin-top: 48px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+.gen-label {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  letter-spacing: 0.3em;
+  color: var(--dim);
+}
+.gen-value {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--fg);
+}
+.gen-arrow { color: var(--accent); font-size: 20px; cursor: pointer; padding: 4px 8px; }
+#genName { min-width: 280px; position: relative; }
+/* ★ for a completed (won) region — sits just after the name */
+.gen-won {
+  color: var(--accent);
+  font-size: 20px;
+  margin-left: -6px;
+  text-shadow: 0 0 14px color-mix(in srgb, var(--accent) 60%, transparent);
+}
+/* Pokémon count under the name, small + yellow */
+.gen-count {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+}
+
+.start-cta, .next-cta {
+  margin-top: 48px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 18px;
+  letter-spacing: 0.15em;
+  color: var(--dim);
+  cursor: pointer;
+  animation: breathe 2.2s ease-in-out infinite;
+}
+
+.score-line {
+  margin-top: 22px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 16px;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+}
+.score-line b { color: var(--accent); font-weight: 700; }
+
+/* ---- playing ---- */
+.timer-bar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.08);
+}
+.timer-fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  background: var(--accent);
+  transform-origin: left;
+}
+.timer-fill.run { animation: drain linear forwards; }
+@keyframes drain { to { transform: scaleX(0); } }
+.timer-bar.low .timer-fill { background: var(--bad); }
+
+/* progress through the region (solved / total) — bottom-center, small, out of
+   the way of the BACK chip up top */
+.progress {
+  position: absolute;
+  bottom: 18px;
+  left: 0; right: 0;
+  text-align: center;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: var(--dim);
+}
+
+/* lives — hearts just under the timer bar */
+.lives {
+  position: absolute;
+  top: 18px;
+  left: 0; right: 0;
+  text-align: center;
+  font-size: 20px;
+  letter-spacing: 4px;
+  line-height: 1;
+}
+.lives .life { color: var(--bad); }
+.lives .life.lost { color: rgba(255, 255, 255, 0.18); }
+
+/* game over screen */
+.gameover-title {
+  font-size: 52px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--bad);
+  text-shadow: 0 0 32px color-mix(in srgb, var(--bad) 50%, transparent);
+  margin-bottom: 28px;
+}
+.gameover-stats {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 22px;
+  line-height: 1.8;
+  letter-spacing: 0.1em;
+  color: var(--dim);
+  margin-bottom: 40px;
+}
+.gameover-stats b { color: var(--accent); font-weight: 700; }
+
+/* ---- win screen ---- */
+#win { overflow: hidden; }
+.win-trophy {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  margin-bottom: 14px;
+  filter: drop-shadow(0 0 36px color-mix(in srgb, var(--accent) 60%, transparent));
+  animation: trophyPop 0.6s cubic-bezier(.2,1.3,.4,1) both, trophyFloat 3s ease-in-out 0.6s infinite;
+  z-index: 1;
+}
+@keyframes trophyPop {
+  0%   { transform: scale(0) rotate(-25deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+@keyframes trophyFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-10px); }
+}
+/* radial burst behind the trophy */
+.win-burst {
+  position: absolute;
+  top: 38%;
+  left: 50%;
+  width: 460px;
+  height: 460px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 22%, transparent) 0%, transparent 62%);
+  animation: burstPulse 2.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes burstPulse {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.92); }
+  50%      { opacity: 1;   transform: translate(-50%, -50%) scale(1.05); }
+}
+.win-title {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+  text-shadow: 0 0 30px color-mix(in srgb, var(--accent) 60%, transparent);
+  z-index: 1;
+  animation: winRise 0.5s ease 0.25s both;
+}
+.win-sub {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 22px;
+  letter-spacing: 0.35em;
+  color: var(--fg);
+  margin-top: 6px;
+  z-index: 1;
+  animation: winRise 0.5s ease 0.4s both;
+}
+.win-stats {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 18px;
+  line-height: 1.6;
+  letter-spacing: 0.08em;
+  color: var(--dim);
+  margin-top: 22px;
+  z-index: 1;
+  animation: winRise 0.5s ease 0.55s both;
+}
+.win-stats b { color: var(--accent); font-weight: 700; }
+@keyframes winRise {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+#win .next-cta { z-index: 1; }
+
+/* Playing and revealed pin their image stage to the SAME fixed top so the
+   Pokémon never jumps between the two screens. The stage is absolutely placed;
+   everything else (verdict above, options/name/score below) is anchored around
+   it, so switching screens moves nothing. */
+.silhouette-stage, .reveal-stage {
+  position: absolute;
+  top: 116px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 240px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.silhouette {
+  max-width: 240px;
+  max-height: 220px;
+  object-fit: contain;
+  /* A true silhouette: brightness(0) flattens EVERY opaque pixel to solid black
+     (kills all internal detail, so you can't read the Pokémon), then invert(1)
+     flips that flat black to flat white — one uniform fill, no detail, opaque.
+     Dimmed slightly so it doesn't glare on the additive lens. */
+  filter: brightness(0) invert(1) brightness(0.55);
+}
+
+/* below the shared image stage, same top in both screens */
+.options, .reveal-bottom {
+  position: absolute;
+  top: 380px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 460px;
+}
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.reveal-bottom { text-align: center; }
+.option {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  text-transform: capitalize;
+  padding: 16px 10px;
+  color: var(--fg);
+  background: rgba(255, 255, 255, 0.05);
+  border: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.option.is-selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+/* ---- revealed ---- (verdict above the stage, the rest below, all absolute so
+   nothing shifts the shared image stage) ---- */
+.verdict {
+  position: absolute;
+  top: 64px;
+  left: 0; right: 0;
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+.verdict.good { color: var(--good); text-shadow: 0 0 28px color-mix(in srgb, var(--good) 50%, transparent); }
+.verdict.bad  { color: var(--bad);  text-shadow: 0 0 28px color-mix(in srgb, var(--bad) 50%, transparent); }
+
+/* both images occupy the exact same spot; the colored one fades in on top of
+   the silhouette, so the shape never moves or scales — it just lights up */
+.reveal-silhouette, .reveal-sprite {
+  position: absolute;
+  max-width: 240px;
+  max-height: 220px;
+  object-fit: contain;
+}
+.reveal-silhouette {
+  filter: brightness(0) invert(1) brightness(0.55);
+}
+.reveal-sprite {
+  filter: drop-shadow(0 0 26px color-mix(in srgb, var(--accent) 35%, transparent));
+  animation: fadeReveal 0.55s ease forwards;
+}
+@keyframes fadeReveal { from { opacity: 0; } to { opacity: 1; } }
+
+.reveal-name {
+  font-size: 40px;
+  font-weight: 700;
+  text-transform: capitalize;
+  margin: 12px 0 6px;
+}
+
+/* ---- loading ---- */
+.loading-msg {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  color: var(--accent);
+  white-space: nowrap;
+  animation: breathe 2.2s ease-in-out infinite;
+}
+.cursor { display: inline-block; margin-left: 2px; animation: blink 0.8s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+@keyframes breathe {
+  0%, 100% { opacity: 0.55; text-shadow: 0 0 12px color-mix(in srgb, var(--accent) 30%, transparent); }
+  50%      { opacity: 1;    text-shadow: 0 0 28px color-mix(in srgb, var(--accent) 70%, transparent); }
+}
+
+/* ---- error ---- */
+.error-msg { font-size: 28px; font-weight: 500; margin-bottom: 30px; }
+.retry-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 26px;
+  background: color-mix(in srgb, var(--accent) 12%, #000);
+  border: 2px solid var(--accent);
+  border-radius: 14px;
+  color: var(--fg);
+  cursor: pointer;
+  font-family: inherit;
+  animation: pulse 1.8s ease-in-out infinite;
+}
+.retry-label { font-size: 22px; font-weight: 600; letter-spacing: 0.08em; }
+.retry-key { font-family: "JetBrains Mono", monospace; font-size: 15px; color: var(--dim); }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 40%, transparent); }
+  50%      { box-shadow: 0 0 0 8px transparent; }
+}
+
+.key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 8px;
+  line-height: 1;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  color: var(--fg);
+}
+
+/* mute toggle — fixed top-right corner, on every screen */
+.mute-corner {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.mute-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+}
+.mute-btn.is-muted { opacity: 0.5; }
+/* gesture hint sits just under the icon — the control it refers to */
+.mute-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: rgba(138, 147, 166, 0.7);
+}
+.mute-hint .key { padding: 1px 5px; font-size: 10px; }
+
+.sound-hint {
+  margin-top: 20px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  color: var(--dim);
+  cursor: pointer;
+}
+
+/* corner hint — top-left, where you'd naturally look to go back / find a toggle.
+   the "hold" tag sits small under the key, overlapping its lower edge, so the
+   hold gesture reads as part of the button rather than a separate label. */
+.corner-hint {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  color: rgba(138, 147, 166, 0.7);
+}
+.hold-chip {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 7px;       /* room for the tag hanging below */
+}
+.hold-chip-tag {
+  position: absolute;
+  bottom: -3px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--accent);
+  color: #000;
+}
+
+/* long-press progress toast */
+.hold-toast {
+  position: absolute;
+  left: 50%;
+  bottom: 70px;
+  transform: translateX(-50%);
+  z-index: 6;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #000;
+  border: 2px solid var(--accent);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+  overflow: hidden;
+}
+.hold-toast::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+/* 400ms = HOLD_MS (600) − TAP_WINDOW (200): bar fills over the time it's shown */
+.hold-toast.filling::before { animation: holdfill 400ms linear forwards; }
+.hold-toast > span { position: relative; }
+@keyframes holdfill { to { transform: scaleX(1); } }

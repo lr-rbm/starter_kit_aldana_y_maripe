@@ -121,7 +121,9 @@ function renderTelemetry(d) {
   $("lat").textContent = d.latitude.toFixed(1) + "°";
   $("lon").textContent = d.longitude.toFixed(1) + "°";
   $("alt").textContent = Math.round(alt);
-  $("speed").textContent = Math.round(speed).toLocaleString();
+  // Fixed comma thousands separator (mission-control style), regardless of
+  // the browser's locale, so the number reads the same for everyone.
+  $("speed").textContent = Math.round(speed).toLocaleString("en-US");
   $("vis").textContent = d.visibility === "daylight" ? "☀ IN SUNLIGHT" : "☾ IN EARTH'S SHADOW";
 }
 

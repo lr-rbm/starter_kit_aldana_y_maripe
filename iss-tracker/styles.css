@@ -27,16 +27,25 @@ html, body {
 
 [hidden] { display: none !important; }
 
+/* small, subtle descriptive line above the title */
+.bigtitle {
+  padding: 26px 32px 0;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--dim);
+}
+
 /* header */
 .head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 26px 32px 0;
+  padding: 4px 32px 0;
   font-family: "JetBrains Mono", monospace;
 }
 .title {
-  font-size: 22px;
+  font-size: 30px;
   letter-spacing: 0.3em;
   color: var(--accent);
 }

@@ -1,0 +1,228 @@
+/* ==================== BASE ==================== */
+:root {
+  --bg-card: #14141f;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0b0;
+  --text-muted: #606070;
+  --accent: #00d4ff;
+  --accent-bright: #33ddff;
+  --focus-glow: rgba(0, 212, 255, 0.4);
+  --radius-md: 12px;
+  --radius-lg: 20px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  background: #000;
+  color: var(--text-primary);
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+}
+
+#app { width: 100%; height: 100%; position: relative; }
+
+/* --- Screens --- */
+.screen {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.screen.hidden { display: none; }
+.hidden { display: none !important; }
+
+/* --- Header --- */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  gap: 14px;
+  flex-shrink: 0;
+}
+.header h1 { font-size: 26px; font-weight: 600; flex: 1; }
+.header-meta { font-size: 14px; color: var(--text-secondary); }
+.back-btn {
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 24px;
+  padding: 8px 14px;
+  border-radius: var(--radius-md);
+  border: 2px solid transparent;
+}
+
+/* --- Content --- */
+.content {
+  flex: 1;
+  padding: 12px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/* --- Focus --- */
+.focusable {
+  transition: all 0.15s ease;
+  border: 2px solid transparent;
+  cursor: pointer;
+}
+.focusable:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 24px var(--focus-glow);
+}
+
+/* ==================== PICK SCREEN ==================== */
+.preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+.preset {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  color: var(--text-primary);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 52px;
+  font-weight: 700;
+  aspect-ratio: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+.preset span {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-top: 6px;
+}
+.preset:focus { background: #1c1c2e; }
+.custom-btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+/* ==================== CUSTOM SCREEN ==================== */
+.custom-content { align-items: center; gap: 28px; }
+.wheels {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.wheel {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 130px;
+}
+.wheel-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 72px;
+  font-weight: 700;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+.wheel-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.wheel-colon {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 64px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.hint {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+/* ==================== RUN SCREEN ==================== */
+.run-content { align-items: center; justify-content: center; }
+.ring-wrap {
+  position: relative;
+  width: 420px;
+  height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ring {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+.ring-track {
+  fill: none;
+  stroke: var(--bg-card);
+  stroke-width: 8;
+}
+.ring-progress {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 8;
+  stroke-linecap: round;
+  stroke-dasharray: 691.15;
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 8px var(--focus-glow));
+  transition: stroke-dashoffset 0.25s linear;
+}
+.timer-display {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 96px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -2px;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 40px rgba(0, 212, 255, 0.25);
+}
+body.done .timer-display { color: var(--accent-bright); animation: pulse 0.8s ease-in-out infinite; }
+body.done .ring-progress { stroke: var(--accent-bright); }
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.35; }
+}
+
+/* --- Nav Bar --- */
+.nav-bar {
+  display: flex;
+  gap: 12px;
+  padding: 16px 24px 24px;
+  flex-shrink: 0;
+}
+.nav-item {
+  flex: 1;
+  padding: 16px 12px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  text-align: center;
+}
+.nav-item:focus { background: #1c1c2e; }
+.nav-item.primary {
+  background: var(--accent);
+  color: #000;
+}
+.nav-item.primary:focus { background: var(--accent-bright); }

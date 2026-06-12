@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no">
+  <title>Quick Timer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ==================== PICK SCREEN ==================== -->
+    <div id="pick" class="screen">
+      <header class="header">
+        <h1>Quick Timer</h1>
+        <span class="header-meta">Pick a time</span>
+      </header>
+
+      <div class="content pick-content">
+        <div class="preset-grid">
+          <button class="preset focusable" data-seconds="60">1<span>min</span></button>
+          <button class="preset focusable" data-seconds="120">2<span>min</span></button>
+          <button class="preset focusable" data-seconds="300">5<span>min</span></button>
+          <button class="preset focusable" data-seconds="600">10<span>min</span></button>
+          <button class="preset focusable" data-seconds="900">15<span>min</span></button>
+          <button class="preset focusable custom-btn" data-action="custom">Custom</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== CUSTOM SCREEN ==================== -->
+    <div id="custom" class="screen hidden">
+      <header class="header">
+        <button class="back-btn focusable" data-action="back">&#8592;</button>
+        <h1>Custom</h1>
+      </header>
+
+      <div class="content custom-content">
+        <div class="wheels">
+          <div class="wheel focusable" id="wheel-min" tabindex="0" data-unit="min" data-max="59">
+            <div class="wheel-value" id="min-value">05</div>
+            <div class="wheel-label">min</div>
+          </div>
+          <div class="wheel-colon">:</div>
+          <div class="wheel focusable" id="wheel-sec" tabindex="0" data-unit="sec" data-max="59" data-step="5">
+            <div class="wheel-value" id="sec-value">00</div>
+            <div class="wheel-label">sec</div>
+          </div>
+        </div>
+        <p class="hint">▲▼ adjust &nbsp;·&nbsp; ◀▶ switch &nbsp;·&nbsp; Enter start</p>
+      </div>
+
+      <nav class="nav-bar">
+        <button class="nav-item focusable primary" data-action="start-custom">Start</button>
+      </nav>
+    </div>
+
+    <!-- ==================== RUN SCREEN ==================== -->
+    <div id="run" class="screen hidden">
+      <div class="content run-content">
+        <div class="ring-wrap">
+          <svg class="ring" viewBox="0 0 240 240">
+            <circle class="ring-track" cx="120" cy="120" r="110"></circle>
+            <circle class="ring-progress" id="ring-progress" cx="120" cy="120" r="110"></circle>
+          </svg>
+          <div class="timer-display" id="timer-display">05:00</div>
+        </div>
+      </div>
+
+      <nav class="nav-bar">
+        <button class="nav-item focusable primary" id="toggle-btn" data-action="toggle">Pause</button>
+        <button class="nav-item focusable" data-action="reset">Reset</button>
+        <button class="nav-item focusable" data-action="back">Back</button>
+      </nav>
+    </div>
+
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>

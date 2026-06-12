@@ -106,7 +106,7 @@ const state = {
   searchSeq: 0,         // guards against out-of-order async responses
 
   currentPlace: null,   // the place shown on the result screen
-  footIdx: 0,           // 0 = star button, 1 = change-city button
+  footIdx: 0,           // foot buttons: 0 = star, 1 = refresh, 2 = change-city
 };
 
 // ============================================================
@@ -352,8 +352,10 @@ function updateStar() {
   $("star-btn").classList.toggle("is-saved", !!fav);
 }
 
+const FOOT_BTNS = () => [$("star-btn"), $("refresh-btn"), $("change-btn")];
+
 function highlightFoot() {
-  const btns = [$("star-btn"), $("change-btn")];
+  const btns = FOOT_BTNS();
   btns.forEach((b, i) => b.classList.toggle("foot-focus", i === state.footIdx));
   btns[state.footIdx].focus();
 }
@@ -399,7 +401,7 @@ function move(dx, dy) {
   if (state.screen === "search") { moveSearch(dx, dy); return; }
   if (state.screen === "result") {
     if (dx < 0 && state.footIdx > 0) { state.footIdx--; highlightFoot(); }
-    else if (dx > 0 && state.footIdx < 1) { state.footIdx++; highlightFoot(); }
+    else if (dx > 0 && state.footIdx < 2) { state.footIdx++; highlightFoot(); }
   }
 }
 
@@ -445,8 +447,9 @@ function enter() {
       pressKey(currentKey());
     }
   } else if (state.screen === "result") {
-    if (state.footIdx === 0) toggleCurrentFavorite(); // ★ save / unsave
-    else openPick();                                   // change city
+    if (state.footIdx === 0) toggleCurrentFavorite();      // ★ save / unsave
+    else if (state.footIdx === 1) refreshWeather();        // ↻ reload forecast
+    else openPick();                                       // change city
   }
 }
 
@@ -478,6 +481,21 @@ document.addEventListener("keydown", (e) => {
 // click support for the simulator / preview
 $("change-btn").addEventListener("click", openPick);
 $("star-btn").addEventListener("click", () => { state.footIdx = 0; highlightFoot(); toggleCurrentFavorite(); });
+$("refresh-btn").addEventListener("click", () => { state.footIdx = 1; highlightFoot(); refreshWeather(); });
+
+// auto-refresh: when the app comes back into view, reload if the data is stale
+// (left open across hours, or the city's day rolled over). Cheap guard: only when
+// showing a result, and only if >10 min old or the forecast date is no longer today.
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden || state.screen !== "result" || !state.currentPlace) return;
+  const ageMin = lastUpdatedAt ? (Date.now() - lastUpdatedAt) / 60000 : Infinity;
+  let dayRolled = false;
+  if (cityOffsetSec != null && lastForecastDate) {
+    const todayStr = new Date(Date.now() + cityOffsetSec * 1000).toISOString().slice(0, 10);
+    dayRolled = lastForecastDate !== todayStr;
+  }
+  if (ageMin > 10 || dayRolled) refreshWeather();
+});
 $("keyboard").addEventListener("click", (e) => {
   const k = e.target.closest(".key"); if (!k) return;
   state.keyRow = +k.dataset.r; state.keyCol = +k.dataset.c; state.zone = "keys";
@@ -516,7 +534,7 @@ $("results").addEventListener("mousemove", (e) => {
 });
 $("result").querySelector(".result-foot").addEventListener("mousemove", (e) => {
   const btn = e.target.closest(".foot-btn"); if (!btn) return;
-  const i = btn.id === "star-btn" ? 0 : 1;
+  const i = btn.id === "star-btn" ? 0 : btn.id === "refresh-btn" ? 1 : 2;
   if (i !== state.footIdx) { state.footIdx = i; highlightFoot(); }
 });
 
@@ -525,7 +543,11 @@ $("result").querySelector(".result-foot").addEventListener("mousemove", (e) => {
 // ============================================================
 function resetResult() {
   cityOffsetSec = null; // clear stale clock until the new city's forecast loads
+  lastForecastDate = null; lastUpdatedAt = null;
   tick();
+  $("r-date").textContent = "—";
+  $("r-date").classList.remove("stale");
+  $("r-updated").textContent = "updating…";
   const v = $("verdict");
   v.className = "verdict";
   $("v-icon").innerHTML = ICONS.load;
@@ -550,14 +572,48 @@ async function fetchWeather(place) {
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
     cityOffsetSec = typeof data.utc_offset_seconds === "number" ? data.utc_offset_seconds : null;
+    // forecast date comes from the data itself (city-local), e.g. "2026-06-12"
+    lastForecastDate = (data.hourly && data.hourly.time && data.hourly.time[0])
+      ? data.hourly.time[0].slice(0, 10) : null;
+    lastUpdatedAt = Date.now();
     tick();
+    renderMeta();
     render(data.hourly);
   } catch (err) {
     $("verdict").className = "verdict";
     $("v-icon").innerHTML = ICONS.warn;
     $("v-text").textContent = "NO DATA";
     $("v-sub").textContent = "couldn't reach the weather service";
+    $("r-updated").textContent = "update failed";
   }
+}
+
+// re-fetch the forecast for the city currently shown (manual ↻ or auto)
+function refreshWeather() {
+  if (!state.currentPlace) return;
+  $("r-updated").textContent = "updating…";
+  fetchWeather(state.currentPlace);
+}
+
+// "Today · Jun 12" + "updated 14:30", both in the city's local time
+function renderMeta() {
+  const dateEl = $("r-date"), updEl = $("r-updated");
+  if (cityOffsetSec == null || !lastForecastDate) {
+    dateEl.textContent = "—"; updEl.textContent = "updated —"; return;
+  }
+  // city-local "now" to compare today vs the forecast date and to stamp the time
+  const localNow = new Date(Date.now() + cityOffsetSec * 1000);
+  const todayStr = localNow.toISOString().slice(0, 10);
+  const [y, m, d] = lastForecastDate.split("-").map(Number);
+  const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const label = lastForecastDate === todayStr ? "Today" : "Forecast";
+  dateEl.textContent = `${label} · ${MON[m - 1]} ${d}`;
+  dateEl.classList.toggle("stale", lastForecastDate !== todayStr);
+
+  const upd = new Date(lastUpdatedAt + cityOffsetSec * 1000);
+  const hh = String(upd.getUTCHours()).padStart(2, "0");
+  const mm = String(upd.getUTCMinutes()).padStart(2, "0");
+  updEl.textContent = `updated ${hh}:${mm}`;
 }
 
 const BANDS = [
@@ -620,6 +676,8 @@ function render(hourly) {
 // ============================================================
 // city's UTC offset in seconds, set once the forecast loads; null until then
 let cityOffsetSec = null;
+let lastForecastDate = null;  // "YYYY-MM-DD" the forecast is for (city-local)
+let lastUpdatedAt = null;     // Date.now() when we last loaded the forecast
 
 function tick() {
   if (cityOffsetSec == null) { $("r-clock").textContent = ""; return; }

@@ -30,6 +30,24 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["-y", "serve", "iss-tracker", "-l", "4360"],
       "port": 4360
+    },
+    {
+      "name": "apod-hud",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "apod-hud", "-l", "4380"],
+      "port": 4380
+    },
+    {
+      "name": "pokedex",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "pokedex", "-l", "4370"],
+      "port": 4370
+    },
+    {
+      "name": "who-is-that-pokemon",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "who-is-that-pokemon", "-l", "4390"],
+      "port": 4390
     }
   ]
 }

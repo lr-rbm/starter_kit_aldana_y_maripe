@@ -15,6 +15,9 @@ Apps we built in this kit:
 | [Humans in Space](humans-in-space/) | How many people are in space right now, floating around with their names, nationality flags, and craft | [humans-in-space.vercel.app](https://humans-in-space.vercel.app) |
 | [Quick Timer](quick-timer/) | Tap a preset (1/2/5/10/15 min) or dial a custom time, then count down with a progress ring | [quick-timer.vercel.app](https://quick-timer.vercel.app) |
 | [ISS Tracker](iss-tracker/) | Live position of the International Space Station on a wireframe world map, with altitude, speed, day/night status, and a metric/imperial toggle | [iss-tracker-blue.vercel.app](https://iss-tracker-blue.vercel.app) |
+| [APOD HUD](apod-hud/) | NASA's Astronomy Picture of the Day, full-lens. Step through days, roll a random shot, jump to a date (hold Enter), flip to the story — with neighbour prefetch so navigation stays instant | [apod-hud.vercel.app](https://apod-hud.vercel.app) |
+| [Pokédex](pokedex/) | Browse Pokémon by generation — type-colored card, stats, physical data, Pokédex entry, tap-to-play cry, and saveable favorites (hold Enter) with their own list | [pokedex-mauve-rho.vercel.app](https://pokedex-mauve-rho.vercel.app) |
+| [Who's That Pokémon?](who-is-that-pokemon/) | The anime guessing game — name the silhouette before the timer runs out, pick your region (Gen 1–3 or all), build a streak | [who-is-that-pokemon-lac.vercel.app](https://who-is-that-pokemon-lac.vercel.app) |
 
 ---
 

@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "raincheck",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "raincheck", "-l", "4321"],
+      "port": 4321
+    },
+    {
+      "name": "rolunchete",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "rolunchete", "-l", "4330"],
+      "port": 4330
+    },
+    {
+      "name": "quick-timer",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "quick-timer", "-l", "4340"],
+      "port": 4340
+    },
+    {
+      "name": "humans-in-space",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "humans-in-space", "-l", "4350"],
+      "port": 4350
+    }
+  ]
+}

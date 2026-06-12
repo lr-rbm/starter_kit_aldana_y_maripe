@@ -24,6 +24,12 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["-y", "serve", "humans-in-space", "-l", "4350"],
       "port": 4350
+    },
+    {
+      "name": "iss-tracker",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "iss-tracker", "-l", "4360"],
+      "port": 4360
     }
   ]
 }

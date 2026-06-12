@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no" />
+  <title>ISS Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <header class="head">
+      <span class="title">ISS · LIVE</span>
+      <div class="head-right">
+        <span class="vis" id="vis"></span>
+        <button class="units" id="unitsBtn" aria-label="Toggle units">
+          <span class="unit-opt" data-unit="metric">KM</span>
+          <span class="unit-sep">/</span>
+          <span class="unit-opt" data-unit="imperial">MI</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- loading -->
+    <div class="loading" id="loading">
+      <span class="type-text" id="typeText"></span><span class="cursor">▌</span>
+    </div>
+
+    <!-- error -->
+    <div class="error-box" id="errorBox" hidden>
+      <div class="error-msg">Lost the signal.</div>
+      <button class="retry-btn" id="retryBtn">
+        <span class="retry-label">RECONNECT</span>
+        <span class="retry-key"><span class="key">Enter</span></span>
+      </button>
+    </div>
+
+    <!-- map + telemetry -->
+    <div class="stage" id="stage" hidden>
+      <div class="map-wrap">
+        <svg id="map" viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg" aria-label="ISS position on world map">
+          <path id="worldPath" d="" fill="none" stroke="#2f4a73" stroke-width="0.5" />
+          <g id="grid"></g>
+          <g id="track"></g>
+          <circle id="iss" r="6" fill="none" />
+        </svg>
+      </div>
+
+      <div class="telemetry">
+        <div class="tcell">
+          <span class="tlabel">LAT</span>
+          <span class="tval" id="lat">—</span>
+        </div>
+        <div class="tcell">
+          <span class="tlabel">LON</span>
+          <span class="tval" id="lon">—</span>
+        </div>
+        <div class="tcell">
+          <span class="tlabel">ALT</span>
+          <span class="tval" id="alt">—</span><span class="tunit" id="altUnit">km</span>
+        </div>
+        <div class="tcell">
+          <span class="tlabel">SPEED</span>
+          <span class="tval" id="speed">—</span><span class="tunit" id="speedUnit">km/h</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <script src="world-map.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

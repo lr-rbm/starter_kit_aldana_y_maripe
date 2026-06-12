@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=600, height=600, initial-scale=1.0, user-scalable=no" />
+  <title>APOD HUD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- the picture fills the lens; black world shows through the dark sky -->
+    <img id="media" class="media" alt="" />
+    <div class="media-scrim" id="mediaScrim"></div>
+
+    <!-- loading -->
+    <div class="center-slot" id="loadingSlot">
+      <div class="loading-msg"><span class="type-text" id="typeText"></span><span class="cursor">▌</span></div>
+    </div>
+
+    <!-- error -->
+    <div class="center-slot" id="errorSlot" hidden>
+      <div class="error-msg">Lost the signal from deep space.</div>
+      <button class="retry-btn" id="retryBtn">
+        <span class="retry-label">TRY AGAIN</span>
+        <span class="retry-key"><span class="key">Enter</span></span>
+      </button>
+    </div>
+
+    <!-- video days can't render inline on the lens; we show the thumb + a note -->
+    <div class="video-badge" id="videoBadge" hidden>▶ VIDEO</div>
+
+    <!-- info overlay: title, date, credit, explanation -->
+    <div class="info" id="info" hidden>
+      <div class="info-kicker">
+        <span id="infoDate">—</span>
+        <span class="info-copyright" id="infoCopyright"></span>
+      </div>
+      <h1 class="info-title" id="infoTitle">—</h1>
+      <p class="info-explain" id="infoExplain"></p>
+    </div>
+
+    <!-- compact title shown over the picture while the full info is closed -->
+    <div class="mini-title" id="miniTitle" hidden></div>
+
+    <!-- date chip, always visible while a picture is up -->
+    <div class="date-chip" id="dateChip" hidden></div>
+
+    <!-- "back to today" control: hold ▶ on glasses (or click this on web).
+         Only shown when viewing a past day. -->
+    <button class="today-pill" id="todayBtn" hidden>
+      TODAY <span class="today-how">hold&nbsp;▶</span>
+    </button>
+
+    <!-- hints double as clickable buttons on PC; on the glasses they're just
+         labels and every action is also on the D-pad -->
+    <div class="hints" id="hints" hidden>
+      <button class="hint" id="prevHint" aria-label="Previous day"><span class="key arrow left"></span></button>
+      <button class="hint" id="nextHint" aria-label="Next day"><span class="key arrow right"></span></button>
+      <span class="hint-label">DAY</span>
+      <button class="hint" id="infoHint"><span class="key arrow up"></span>&nbsp;INFO</button>
+      <button class="hint" id="randomHint"><span class="key">Enter</span>&nbsp;RANDOM</button>
+      <button class="hint" id="pickHint"><span class="key">Hold&nbsp;⏎</span>&nbsp;DATE</button>
+    </div>
+
+    <!-- long-press progress toast: shows the pending action + a filling bar -->
+    <div class="hold-toast" id="holdToast" hidden><span id="holdLabel"></span></div>
+
+    <!-- date wheel-picker (opened by holding Enter). Year / Month / Day columns;
+         ◀▶ move column, ▲▼ change value, Enter confirms, hold Enter cancels. -->
+    <div class="picker" id="picker" hidden>
+      <div class="picker-title">GO TO DATE</div>
+      <div class="picker-cols">
+        <div class="picker-col" data-col="year">
+          <div class="picker-up">▲</div>
+          <div class="picker-val" id="pickYear">—</div>
+          <div class="picker-down">▼</div>
+          <div class="picker-label">YEAR</div>
+        </div>
+        <div class="picker-col" data-col="month">
+          <div class="picker-up">▲</div>
+          <div class="picker-val" id="pickMonth">—</div>
+          <div class="picker-down">▼</div>
+          <div class="picker-label">MONTH</div>
+        </div>
+        <div class="picker-col" data-col="day">
+          <div class="picker-up">▲</div>
+          <div class="picker-val" id="pickDay">—</div>
+          <div class="picker-down">▼</div>
+          <div class="picker-label">DAY</div>
+        </div>
+      </div>
+      <div class="picker-hints">
+        <span><span class="key arrow left"></span><span class="key arrow right"></span> COLUMN</span>
+        <span><span class="key arrow up"></span><span class="key arrow down"></span> ADJUST</span>
+        <span><span class="key">Enter</span> GO</span>
+        <span><span class="key">Hold&nbsp;⏎</span> CANCEL</span>
+      </div>
+    </div>
+
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
